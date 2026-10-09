@@ -33,7 +33,7 @@ const config: Config = {
       },
       fontFamily: {
         sans: [
-          '"IBM Plex Sans Arabic"',
+          "var(--font-handicrafts)",
           "Tajawal",
           '"Segoe UI"',
           "Tahoma",
