@@ -30,7 +30,11 @@ jobs:
         run: npm install --no-audit --no-fund
 
       - name: Build static site
-        run: npm run build
+        run: |
+          echo "BASE_DEBUG=[$PAGES_BASE_PATH]"
+          npm run build
+          grep -o '"assetPrefix":"[^"]*"' out/index.html | head -1
+          grep -o 'href="[^"]*.css"' out/index.html | head -1
         env:
           PAGES_BASE_PATH: /miras-athar-season
 
