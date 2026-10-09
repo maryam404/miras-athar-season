@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { handicrafts } from "./fonts";
 
 export const metadata: Metadata = {
   title: "مراس أثر الموسم | مبادرة نون متحد",
@@ -26,7 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-screen bg-sand-cream">{children}</body>
+      <body className={`min-h-screen bg-sand-cream ${handicrafts.variable}`}>{children}</body>
     </html>
   );
 }
