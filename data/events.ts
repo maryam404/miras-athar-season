@@ -17,7 +17,7 @@ export const TIMEZONE = "Asia/Riyadh" as const;
 export const SEASON_EVENTS: SeasonEvent[] = [
   { id: 1, title: "تعارف وعرض الخطة السنوية والبرامج", type: "احتفال", hijriDate: "1448/4/1", gregorianDate: "2026-09-12", displayGregorianDate: "12 سبتمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 2, title: "وطن يخدم هويتنا في خدمة ضيوف الرحمن", type: "احتفال", hijriDate: "1448/4/22", gregorianDate: "2026-10-03", displayGregorianDate: "3 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 3, title: "صوت الحاج - قراءة في تجربة ضيف الرحمن خلال الموسم", type: "أمسية", hijriDate: "1448/4/29", gregorianDate: "2026-10-10", displayGregorianDate: "10 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
+  { id: 3, title: "صوت الحاج - قراءة في تجربة ضيف الرحمن خلال الموسم", type: "أمسية", hijriDate: "1448/5/6", gregorianDate: "2026-10-17", displayGregorianDate: "17 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 4, title: "وحدة القيادة في فرق خدمة ضيوف الرحمن - دروس من الموسم", type: "ندوة", hijriDate: "1448/5/13", gregorianDate: "2026-10-24", displayGregorianDate: "24 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 5, title: "الرفق والاحتواء في المواقف الميدانية لخدمة ضيوف الرحمن", type: "أمسية", hijriDate: "1448/5/26", gregorianDate: "2026-11-07", displayGregorianDate: "7 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 6, title: "مبادرات صنعت أثراً في موسم الحج", type: "لقاء مفتوح", hijriDate: "1448/6/18", gregorianDate: "2026-11-28", displayGregorianDate: "28 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
