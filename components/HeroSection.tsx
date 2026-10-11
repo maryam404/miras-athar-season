@@ -21,11 +21,6 @@ export default function HeroSection({ now }: { now: number }) {
       </div>
 
       <div className="relative mx-auto max-w-6xl px-5 pb-20 pt-12 text-center sm:px-8 sm:pb-24 sm:pt-16">
-        <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-white/25 bg-white/10 px-4 py-1.5 text-xs font-bold backdrop-blur">
-          <span className="h-1.5 w-1.5 rounded-full bg-rose-brand" />
-          مبادرة نون متحد × جمعية علم الحج
-        </div>
-
         <h1 className="text-4xl font-black leading-tight tracking-tight sm:text-6xl sm:leading-[1.25]">
           مراس أثر الموسم
         </h1>
@@ -37,12 +32,6 @@ export default function HeroSection({ now }: { now: number }) {
         </p>
 
         <div className="mx-auto mt-7 flex max-w-xl flex-wrap items-center justify-center gap-2.5 text-[12px] font-bold">
-          <span className="rounded-full bg-white/10 px-4 py-1.5 backdrop-blur border border-white/15">
-            18 برنامجًا وفعالية
-          </span>
-          <span className="rounded-full bg-white/10 px-4 py-1.5 backdrop-blur border border-white/15">
-            5:00 - 8:00 مساءً بتوقيت الرياض
-          </span>
           <span className="rounded-full bg-rose-brand/90 px-4 py-1.5 text-white">
             {formatRiyadhNow(now)}
           </span>
