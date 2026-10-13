@@ -7,7 +7,7 @@ export default function Footer() {
     <footer className="mt-14 bg-brand-deep text-white">
       <div className="mx-auto max-w-6xl px-5 py-10 text-center sm:px-8">
         <Image
-          src={`${basePath}/logos.png`}
+          src={`${basePath}/logos-footer.png`}
           alt="شعارات مبادرة نون متحد وجمعية علم الحج"
           width={3163}
           height={249}
