@@ -2,7 +2,7 @@
 
 import { CalendarDays, Clock3, MapPin, MonitorSmartphone, Sparkles } from "lucide-react";
 import type { SeasonEvent } from "@/data/events";
-import { getEventStatus } from "@/lib/datetime";
+import { formatEventDuration, formatEventTimeRange, formatTime12h, getEventStatus } from "@/lib/datetime";
 import { cn } from "@/lib/cn";
 import Countdown from "./Countdown";
 import EventStatusBadge from "./EventStatusBadge";
@@ -64,8 +64,8 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
           </div>
           <div className="flex items-center gap-2 text-ink/80">
             <Clock3 className="h-4 w-4 shrink-0 text-brand" />
-            <span className="font-semibold">5:00 مساءً - 8:00 مساءً</span>
-            <span className="text-muted">(3 ساعات)</span>
+            <span className="font-semibold">{formatEventTimeRange(event)}</span>
+            <span className="text-muted">{formatEventDuration(event)}</span>
           </div>
           <div className="flex items-center gap-2">
             {remote ? (
@@ -95,7 +95,7 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
               </span>
               <div>
                 <p className="text-sm font-extrabold text-brand-deep">البرنامج منعقد الآن</p>
-                <p className="text-xs font-semibold text-muted">حتى الساعة 8:00 مساءً</p>
+                <p className="text-xs font-semibold text-muted">حتى الساعة {formatTime12h(event.endTime)}</p>
               </div>
             </div>
           )}
