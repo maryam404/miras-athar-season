@@ -51,7 +51,6 @@ export function getTimeRemaining(event: SeasonEvent, nowMs: number = Date.now())
   const seconds = totalSeconds % 60;
   return { totalMs: diff, days, hours, minutes, seconds, isOverdue: start - nowMs <= 0 };
 }
-
 export function withStatus(nowMs: number = Date.now()) {
   return SEASON_EVENTS.map((event) => ({
     event,
@@ -105,4 +104,22 @@ export const STATUS_LABEL: Record<EventStatus, string> = { upcoming: "قادم",
 
 export function pad2(n: number): string {
   return n.toString().padStart(2, "0");
+}
+
+export function formatTime12h(hm: string): string {
+  const { h, m } = parseHM(hm);
+  const period = h < 12 ? "صباحًا" : "مساءً";
+  const h12 = h % 12 === 0 ? 12 : h % 12;
+  return `${h12}:${pad2(m)} ${period}`;
+}
+
+export function formatEventTimeRange(event: SeasonEvent): string {
+  return `${formatTime12h(event.startTime)} - ${formatTime12h(event.endTime)}`;
+}
+
+export function formatEventDuration(event: SeasonEvent): string {
+  const s = parseHM(event.startTime);
+  const e = parseHM(event.endTime);
+  const hours = Math.round((e.h * 60 + e.m - (s.h * 60 + s.m)) / 60);
+  return `(${hours} ساعات)`;
 }
