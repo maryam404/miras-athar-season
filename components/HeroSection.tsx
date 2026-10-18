@@ -3,6 +3,7 @@ import { formatRiyadhNow } from "@/lib/datetime";
 export default function HeroSection({ now }: { now: number }) {
   return (
     <header className="relative overflow-hidden bg-brand-deep text-white">
+      {/* soft decorative shapes */}
       <div aria-hidden className="pointer-events-none absolute inset-0">
         <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-rose-brand/25 blur-3xl" />
         <div className="absolute top-10 right-[12%] h-40 w-40 rounded-full bg-sand/25 blur-2xl" />

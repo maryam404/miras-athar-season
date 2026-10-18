@@ -17,9 +17,10 @@ interface Props {
 export default function EventCard({ event, now, isNext = false, index = 0 }: Props) {
   const status = getEventStatus(event, now);
   const remote = event.execution === "عن بُعد";
+
   return (
     <article
-      style={{ animationDelay: (Math.min(index, 8) * 70) + "ms" }}
+      style={{ animationDelay: `${Math.min(index, 8) * 70}ms` }}
       className={cn(
         "group flex animate-fade-up flex-col overflow-hidden rounded-3xl border bg-white shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover",
         status === "live" && "border-brand/40 shadow-live",
@@ -27,6 +28,7 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
         isNext && status === "upcoming" && "border-rose-brand/60 shadow-glow",
       )}
     >
+      {/* top accent */}
       <div
         className={cn(
           "h-1.5 w-full",
@@ -40,6 +42,7 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
         )}
       />
       <div className="flex flex-1 flex-col gap-4 p-5 sm:p-6">
+        {/* badges row */}
         <div className="flex flex-wrap items-center gap-2">
           <span className="inline-flex items-center rounded-full bg-sand-pale px-3 py-1 text-[11px] font-bold text-brand-deep">
             {event.type}
@@ -52,9 +55,13 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
             </span>
           )}
         </div>
+
+        {/* title */}
         <h3 className="text-[17px] font-extrabold leading-8 text-ink sm:text-lg">
           {event.title}
         </h3>
+
+        {/* meta */}
         <dl className="grid grid-cols-1 gap-2.5 text-[13px]">
           <div className="flex items-center gap-2 text-ink/80">
             <CalendarDays className="h-4 w-4 shrink-0 text-brand" />
@@ -85,6 +92,8 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
             </span>
           </div>
         </dl>
+
+        {/* countdown / live / done */}
         <div className="mt-auto border-t border-dashed border-brand/15 pt-4">
           {status === "upcoming" && <Countdown event={event} now={now} />}
           {status === "live" && (

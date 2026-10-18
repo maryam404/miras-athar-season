@@ -10,6 +10,7 @@ import {
   sortUpcomingEvents,
 } from "@/lib/datetime";
 import { useNow } from "@/lib/hooks";
+import Navbar from "@/components/Navbar";
 import HeroSection from "@/components/HeroSection";
 import StatsCards from "@/components/StatsCards";
 import Filters, { type ExecutionFilter, type StatusFilter } from "@/components/Filters";
@@ -33,12 +34,22 @@ export default function HomePage() {
     });
   }, [execution, statusFilter, now]);
 
-  const live = useMemo(() => sortLiveEvents(filtered, now), [filtered, now]);
-  const upcoming = useMemo(() => sortUpcomingEvents(filtered, now), [filtered, now]);
-  const completed = useMemo(() => sortCompletedEvents(filtered, now), [filtered, now]);
+  const live = useMemo(
+    () => sortLiveEvents(filtered, now),
+    [filtered, now],
+  );
+  const upcoming = useMemo(
+    () => sortUpcomingEvents(filtered, now),
+    [filtered, now],
+  );
+  const completed = useMemo(
+    () => sortCompletedEvents(filtered, now),
+    [filtered, now],
+  );
 
   return (
-    <main className="min-h-screen bg-sand-cream pb-0">
+    <main className="min-h-screen bg-sand-cream pb-0 pt-14">
+      <Navbar />
       <HeroSection now={now} />
       <StatsCards stats={stats} />
       <Filters

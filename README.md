@@ -18,10 +18,6 @@ npm run build
 npm start
 ```
 
-## النشر على GitHub Pages
-
-المشروع مُعد للتصدير الثابت (`output: "export"`). عند الدفع إلى فرع `main` يعمل workflow تلقائيًا ويبني الموقع وينشره.
-
 ## المواصفات
 
 - **الإطار:** Next.js 14 (App Router) + TypeScript + Tailwind CSS + Lucide React
