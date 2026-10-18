@@ -2,7 +2,7 @@
 
 import { CalendarDays, Clock3, MapPin, MonitorSmartphone, Sparkles } from "lucide-react";
 import type { SeasonEvent } from "@/data/events";
-import { formatEventDuration, formatEventTimeRange, formatTime12h, getEventStatus } from "@/lib/datetime";
+import { getEventStatus } from "@/lib/datetime";
 import { cn } from "@/lib/cn";
 import Countdown from "./Countdown";
 import EventStatusBadge from "./EventStatusBadge";
@@ -66,13 +66,13 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
           <div className="flex items-center gap-2 text-ink/80">
             <CalendarDays className="h-4 w-4 shrink-0 text-brand" />
             <span className="font-semibold">{event.displayGregorianDate}</span>
-            <span className="text-muted">•</span>
+            <span classNametext-muted">•</span>
             <span className="font-semibold text-muted">{event.hijriDate} هـ</span>
           </div>
           <div className="flex items-center gap-2 text-ink/80">
             <Clock3 className="h-4 w-4 shrink-0 text-brand" />
-            <span className="font-semibold">{formatEventTimeRange(event)}</span>
-            <span className="text-muted">{formatEventDuration(event)}</span>
+            <span className="font-semibold">5:00 مساءً - 8:00 مساءً</span>
+            <span className="text-muted">(3 ساعات)</span>
           </div>
           <div className="flex items-center gap-2">
             {remote ? (
@@ -90,6 +90,7 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
             >
               {event.execution}
             </span>
+            <span className="text-xs text-muted">توقيت الرياض</span>
           </div>
         </dl>
 
@@ -104,7 +105,7 @@ export default function EventCard({ event, now, isNext = false, index = 0 }: Pro
               </span>
               <div>
                 <p className="text-sm font-extrabold text-brand-deep">البرنامج منعقد الآن</p>
-                <p className="text-xs font-semibold text-muted">حتى الساعة {formatTime12h(event.endTime)}</p>
+                <p className="text-xs font-semibold text-muted">حتى الساعة 8:00 مساءً بتوقيت الرياض</p>
               </div>
             </div>
           )}
