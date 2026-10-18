@@ -41,7 +41,7 @@ export default function Navbar() {
                 isAbout ? "bg-brand-deep text-white shadow-md" : "text-brand-deep hover:bg-sand-200 hover:text-brand-deep"
               )}
             >
-              عن المبادرة
+              البرنامج القادم
             </Link>
           </div>
         </div>
