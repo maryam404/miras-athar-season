@@ -1,6 +1,7 @@
 export type ExecutionType = "حضوري" | "عن بُعد";
 export type EventStatus = "upcoming" | "live" | "completed";
 
+
 export interface SeasonEvent {
   id: number;
   title: string;
@@ -13,6 +14,7 @@ export interface SeasonEvent {
   execution: ExecutionType;
 }
 
+
 export const TIMEZONE = "Asia/Riyadh" as const;
 export const SEASON_EVENTS: SeasonEvent[] = [
   { id: 1, title: "تعارف وعرض الخطة السنوية والبرامج", type: "احتفال", hijriDate: "1448/4/1", gregorianDate: "2026-09-12", displayGregorianDate: "12 سبتمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
@@ -20,7 +22,7 @@ export const SEASON_EVENTS: SeasonEvent[] = [
   { id: 3, title: "صوت الحاج - قراءة في تجربة ضيف الرحمن خلال الموسم", type: "أمسية", hijriDate: "1448/5/6", gregorianDate: "2026-10-17", displayGregorianDate: "17 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 4, title: "القيادة الرحيمة: حين يجتمع الحزم بالاحتواء", type: "لقاء مفتوح", hijriDate: "1448/5/13", gregorianDate: "2026-10-24", displayGregorianDate: "24 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 5, title: "الرفق والاحتواء في المواقف الميدانية لخدمة ضيوف الرحمن", type: "أمسية", hijriDate: "1448/5/27", gregorianDate: "2026-11-07", displayGregorianDate: "7 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 6, title: "مبادرات صنعت أثراً في موسم الحج", type: "لقاء مفتوح", hijriDate: "1448/6/18", gregorianDate: "2026-11-28", displayGregorianDate: "28 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
+  { id: 6, title: "مبادرات صنعت أثراً في موسم الحج", type: "لقاء مفتوح", hijriDate: "1448/6/18", gregorianDate: "2026-11-28", displayGregorianDate: "28 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 7, title: "تكامل فرق العمل في موسم الحج", type: "ندوة", hijriDate: "1448/7/3", gregorianDate: "2026-12-12", displayGregorianDate: "12 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 8, title: "الشورى وصناعة القرار في فرق العمل الميدانية", type: "فعالية", hijriDate: "1448/11/3", gregorianDate: "2027-04-10", displayGregorianDate: "10 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 9, title: "ملتقى الخبرات في صناعة المبادرات المتميزة بشركات حجاج الداخل - الأقسام النسائية موسم 1448هـ", type: "نقل تجربة", hijriDate: "1448/7/24", gregorianDate: "2027-01-02", displayGregorianDate: "2 يناير 2027", startTime: "10:00", endTime: "16:00", execution: "حضوري" },
@@ -34,3 +36,4 @@ export const SEASON_EVENTS: SeasonEvent[] = [
   { id: 17, title: "إدارة الخلاف والمسؤولية تحت ضغط الموسم", type: "ندوة", hijriDate: "1448/11/10", gregorianDate: "2027-04-17", displayGregorianDate: "17 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 18, title: "جاهزية المرافق والخدمات في موسم الحج (تحديات وحلول)", type: "لقاء مفتوح", hijriDate: "1448/11/17", gregorianDate: "2027-04-24", displayGregorianDate: "24 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
 ];
+
