@@ -4,6 +4,10 @@ export type EventStatus = "upcoming" | "live" | "completed";
 
 
 
+
+
+
+
 export interface SeasonEvent {
   id: number;
   title: string;
@@ -15,6 +19,10 @@ export interface SeasonEvent {
   endTime: string;
   execution: ExecutionType;
 }
+
+
+
+
 
 
 
@@ -34,7 +42,3 @@ export const SEASON_EVENTS: SeasonEvent[] = [
   { id: 11, title: "التواصل الفعال وأثره في جودة الخدمة خلال الموسم", type: "ندوة", hijriDate: "1448/8/22", gregorianDate: "2027-01-30", displayGregorianDate: "30 يناير 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
   { id: 12, title: "الإحسان قيمة مهنية في خدمة ضيوف الرحمن", type: "أمسية", hijriDate: "1448/9/6", gregorianDate: "2027-02-13", displayGregorianDate: "13 فبراير 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
   { id: 13, title: "عيد نون متحد - لقاء العيد في الحج", type: "احتفال", hijriDate: "1448/10/12", gregorianDate: "2027-03-20", displayGregorianDate: "20 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 14, title: "لماذا تنهار فرق الموسم؟ تحديات بناء الفريق واستدامته", type: "ورشة", hijriDate: "1448/10/19", gregorianDate: "2027-03-27", displayGregorianDate: "27 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 15, title: "القيادة الميدانية من منظور فريق التنفيذ", type: "ندوة", hijriDate: "1448/10/26", gregorianDate: "2027-04-03", displayGregorianDate: "3 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 16, title: "تطبيقات الذكاء الاصطناعي في تطوير خدمات الحج وتحسين تجربة المستفيد", type: "ورشة", hijriDate: "1448/7/17", gregorianDate: "2026-12-26", displayGregorianDate: "26 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 17, title: "إدارة الخلاف والمسؤولية تحت ضغط الموسم", type: "ندوة", hijriDate: "1448/11/10", gregorianDate: "2027-04-17", displayGregorianDate: "17 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
