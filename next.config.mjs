@@ -7,6 +7,8 @@ const basePath = process.env.PAGES_BASE_PATH || "";
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: "export",
+  // شرطة نهاية موحّدة: يجعل كل الروابط داخل نطاق Service Worker حتى دون إنترنت
+  trailingSlash: true,
   ...(basePath ? { basePath, assetPrefix: basePath + "/" } : {}),
   images: { unoptimized: true },
   reactStrictMode: true,
