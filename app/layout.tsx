@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { handicrafts } from "./fonts";
+import PWARegister from "@/components/PWARegister";
+
+const BASE_PATH = process.env.PAGES_BASE_PATH || "";
 
 export const metadata: Metadata = {
   title: "مراس أثر الموسم | مبادرة نون متحد",
@@ -20,6 +23,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="ar" dir="rtl">
       <head>
+        <link
+          rel="manifest"
+          href={`${BASE_PATH}/manifest.webmanifest`}
+        />
+        <meta name="theme-color" content="#855970" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="#855970" />
+        <meta name="apple-mobile-web-app-title" content="مراس أثر الموسم" />
+        <meta name="application-name" content="مراس أثر الموسم" />
+        <link rel="apple-touch-icon" href={`${BASE_PATH}/apple-touch-icon.png`} />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
@@ -27,7 +41,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           rel="stylesheet"
         />
       </head>
-      <body className={`min-h-screen bg-sand-cream ${handicrafts.variable}`}>{children}</body>
+      <body className={`min-h-screen bg-sand-cream ${handicrafts.variable}`}>
+        {children}
+        <PWARegister />
+      </body>
     </html>
   );
 }
