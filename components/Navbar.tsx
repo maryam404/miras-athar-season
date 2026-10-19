@@ -41,7 +41,7 @@ export default function Navbar() {
               الرئيسية
             </Link>
             <Link
-              href="/about/"
+              href="/about"
               className={cn(
                 "rounded-full px-4 py-2 text-sm font-bold transition-colors duration-200",
                 isAbout
