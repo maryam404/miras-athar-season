@@ -1,0 +1,44 @@
+name: Decode icons
+
+# فكّ تشفير أيقونات PWA (من base64 إلى PNG) في مجلد public/
+# يعمل فقط عند تغيير ملفات .icons/*.b64
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - ".icons/**"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  decode:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Decode base64 to PNG
+        run: |
+          mkdir -p public
+          base64 -d .icons/icon-512.png.b64 > public/icon-512.png
+          base64 -d .icons/icon-192.png.b64 > public/icon-192.png
+          base64 -d .icons/apple-touch-icon.png.b64 > public/apple-touch-icon.png
+
+      - name: Verify PNG signatures
+        run: |
+          for f in public/icon-512.png public/icon-192.png public/apple-touch-icon.png; do
+            head -c 8 "$f" | xxd -p | grep -q "89504e470d0a1a0a" || { echo "INVALID PNG: $f"; exit 1; }
+          done
+          echo "ALL_PNG_VALID"
+
+      - name: Commit icons
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/icon-512.png public/icon-192.png public/apple-touch-icon.png
+          git diff --cached --quiet && echo "NO Changes" && exit 0
+          git commit -m "إضافة أيقونات PWA فكّ تشفيرها من base64"
+          git push
