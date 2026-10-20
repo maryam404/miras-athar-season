@@ -1,8 +1,65 @@
 "use client";
 
 import Link from "next/link";
+import {
+  BadgeCheck,
+  BookOpen,
+  Compass,
+  GraduationCap,
+  Lightbulb,
+  MessagesSquare,
+  Mountain,
+  Network,
+  Sparkles,
+  Speech,
+  Sprout,
+  UsersRound,
+} from "lucide-react";
+import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import { handicrafts } from "@/app/fonts";
+
+const GOALS = [
+  {
+    title: "تطوير القدرات المهنية",
+    desc: "تنمية مهارات العاملات في الأقسام النسائية بشركات حجاج الداخل",
+    Icon: GraduationCap,
+  },
+  {
+    title: "إثراء المعرفة",
+    desc: "تعزيز المعرفة المهنية المرتبطة بالعمل الموسمي وخدمة ضيوف الرحمن",
+    Icon: BookOpen,
+  },
+  {
+    title: "تبادل الخبرات",
+    desc: "إتاحة مساحات لتبادل التجارب والممارسات المهنية",
+    Icon: MessagesSquare,
+  },
+  {
+    title: "تعزيز التكامل",
+    desc: "دعم التواصل والتعاون والعمل الجماعي بين الفرق",
+    Icon: Network,
+  },
+  {
+    title: "تحسين جودة الخدمات",
+    desc: "المساهمة في تطوير تجربة ضيوف الرحمن والارتقاء بجودة الخدمات",
+    Icon: BadgeCheck,
+  },
+  {
+    title: "استدامة الأثر",
+    desc: "تعزيز استمرار الاستفادة من المعرفة والخبرات بعد انتهاء الموسم",
+    Icon: Sprout,
+  },
+] as const;
+
+const FIELDS = [
+  { title: "القيادة الميدانية", num: "٠١", Icon: Compass },
+  { title: "الابتكار والتطوير", num: "٠٢", Icon: Lightbulb },
+  { title: "جودة الخدمات", num: "٠٣", Icon: Sparkles },
+  { title: "التواصل الفعال", num: "٠٤", Icon: Speech },
+  { title: "تحديات العمل الموسمي", num: "٠٥", Icon: Mountain },
+  { title: "العمل الجماعي وتبادل الخبرات", num: "٠٦", Icon: UsersRound },
+] as const;
 
 export default function AboutPage() {
   return (
@@ -54,45 +111,20 @@ export default function AboutPage() {
       {/* أهداف المبادرة */}
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <h2 className="text-2xl font-black text-ink mb-8 sm:text-3xl">أهداف المبادرة</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {[
-            {
-              title: "تطوير القدرات المهنية",
-              desc: "تنمية مهارات العاملات في الأقسام النسائية بشركات حجاج الداخل",
-            },
-            {
-              title: "إثراء المعرفة",
-              desc: "تعزيز المعرفة المهنية المرتبطة بالعمل الموسمي وخدمة ضيوف الرحمن",
-            },
-            {
-              title: "تبادل الخبرات",
-              desc: "إتاحة مساحات لتبادل التجارب والممارسات المهنية",
-            },
-            {
-              title: "تعزيز التكامل",
-              desc: "دعم التواصل والتعاون والعمل الجماعي بين الفرق",
-            },
-            {
-              title: "تحسين جودة الخدمات",
-              desc: "المساهمة في تطوير تجربة ضيوف الرحمن والارتقاء بجودة الخدمات",
-            },
-            {
-              title: "استدامة الأثر",
-              desc: "تعزيز استمرار الاستفادة من المعرفة والخبرات بعد انتهاء الموسم",
-            },
-          ].map((item, idx) => (
-            <div
-              key={idx}
-              className="rounded-3xl border border-brand/10 bg-white/70 p-6 shadow-card hover:shadow-card-hover transition-all duration-300 group hover:-translate-y-1"
+        <ul className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {GOALS.map(({ title, desc, Icon }) => (
+            <li
+              key={title}
+              className="group rounded-3xl border border-brand/10 bg-white/70 p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:transform-none motion-reduce:hover:shadow-card"
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/[0.1] text-brand-deep mb-4">
-                ◆
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full border border-brand/15 bg-brand/[0.08] text-brand-deep transition-transform duration-300 group-hover:scale-110 motion-reduce:transform-none">
+                <Icon className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
               </div>
-              <h3 className="text-lg font-bold text-ink mb-2">{item.title}</h3>
-              <p className="text-muted text-sm leading-6">{item.desc}</p>
-            </div>
+              <h3 className="text-lg font-bold text-ink mb-2">{title}</h3>
+              <p className="text-muted text-sm leading-6">{desc}</p>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
       {/* البرامج والفعاليات */}
@@ -128,57 +160,40 @@ export default function AboutPage() {
       {/* المجالات الرئيسية */}
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <h2 className="text-2xl font-black text-ink mb-8 sm:text-3xl">المجالات الرئيسية</h2>
-        <div className="flex flex-wrap justify-center gap-4">
-          {[
-            "القيادة الميدانية",
-            "الابتكار والتطوير",
-            "جودة الخدمات",
-            "التواصل الفعال",
-            "تحديات العمل الموسمي",
-            "العمل الجماعي وتبادل الخبرات",
-          ].map((field, idx) => (
-            <span
-              key={idx}
-              className="inline-flex items-center rounded-full border border-brand/20 bg-brand/5 px-4 py-1.5 text-xs font-bold text-brand-deep"
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          {FIELDS.map(({ title, num, Icon }) => (
+            <li
+              key={num}
+              className="group relative overflow-hidden rounded-3xl border border-brand/10 bg-gradient-to-bl from-white/90 via-rose-pale/70 to-sand-pale p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:transform-none motion-reduce:hover:shadow-card"
             >
-              {field}
-            </span>
+              <span
+                aria-hidden="true"
+                className="pointer-events-none absolute -bottom-10 -left-10 h-28 w-28 rounded-full bg-rose-brand/15 blur-2xl opacity-50 transition-opacity duration-300 group-hover:opacity-90 motion-reduce:transition-none"
+              />
+              <div className="relative flex items-center gap-4">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand/20 bg-white text-brand-deep shadow-sm transition-colors duration-300 group-hover:border-brand-dark group-hover:bg-brand group-hover:text-white motion-reduce:transition-none">
+                  <Icon className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
+                </span>
+                <h3 className="min-h-14 text-base font-black leading-7 text-ink sm:text-lg">
+                  {title}
+                </h3>
+              </div>
+              <div className="relative mt-6 flex items-center gap-3">
+                <span
+                  aria-hidden="true"
+                  className="h-px flex-1 bg-gradient-to-l from-transparent via-brand/25 to-brand/40"
+                />
+                <span
+                  aria-hidden="true"
+                  dir="ltr"
+                  className="text-2xl font-black tabular-nums leading-none text-brand/25 transition-colors duration-300 group-hover:text-brand/45 motion-reduce:transition-none"
+                >
+                  {num}
+                </span>
+              </div>
+            </li>
           ))}
-        </div>
-      </section>
-
-      {/* الجهات القائمة */}
-      <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
-        <h2 className="text-2xl font-black text-ink mb-8 sm:text-3xl">
-          الجهات القائمة والشراكة
-        </h2>
-        <div className="rounded-3xl border border-brand/10 bg-white/70 p-8 shadow-card flex flex-col sm:flex-row gap-6 items-center text-center sm:text-start">
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/[0.1] text-brand-deep">
-              ◆
-            </div>
-            <div>
-              <h3 className="font-bold text-lg text-ink">
-                المجلس التنسيقي لمنشآت حجاج الداخل – نون متحد
-              </h3>
-              <p className="text-muted text-sm mt-1">
-                الجهة الرئيسية المنظمة للمبادرة
-              </p>
-            </div>
-          </div>
-          <div className="w-full sm:w-auto sm:mt-0 border-t sm:border-t-0 sm:border-l border-brand/20 sm:px-6 pt-4 sm:pt-0"></div>
-          <div className="flex items-center gap-4">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand/[0.1] text-brand-deep">
-              ◆
-            </div>
-            <div>
-              <h3 className="font-bold text-lg text-ink">جمعية علم الحج</h3>
-              <p className="text-muted text-sm mt-1">
-                الشراكة في تنظيم وتنفيذ البرامج والفعاليات
-              </p>
-            </div>
-          </div>
-        </div>
+        </ul>
       </section>
 
       {/* CTA Section */}
@@ -197,6 +212,8 @@ export default function AboutPage() {
           </Link>
         </div>
       </section>
+
+      <Footer />
     </main>
   );
 }
