@@ -53,12 +53,12 @@ const GOALS = [
 ] as const;
 
 const FIELDS = [
-  { title: "القيادة الميدانية", num: "٠١", Icon: Compass },
-  { title: "الابتكار والتطوير", num: "٠٢", Icon: Lightbulb },
-  { title: "جودة الخدمات", num: "٠٣", Icon: Sparkles },
-  { title: "التواصل الفعال", num: "٠٤", Icon: Speech },
-  { title: "تحديات العمل الموسمي", num: "٠٥", Icon: Mountain },
-  { title: "العمل الجماعي وتبادل الخبرات", num: "٠٦", Icon: UsersRound },
+  { title: "القيادة الميدانية", Icon: Compass },
+  { title: "الابتكار والتطوير", Icon: Lightbulb },
+  { title: "تحديات العمل الموسمي", Icon: Mountain },
+  { title: "التواصل الفعال", Icon: Speech },
+  { title: "العمل الجماعي وتبادل الخبرات", Icon: UsersRound },
+  { title: "جودة الخدمات", Icon: Sparkles },
 ] as const;
 
 export default function AboutPage() {
@@ -160,37 +160,20 @@ export default function AboutPage() {
       {/* المجالات الرئيسية */}
       <section className="mx-auto max-w-6xl px-5 py-16 sm:px-8">
         <h2 className="text-2xl font-black text-ink mb-8 sm:text-3xl">المجالات الرئيسية</h2>
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3">
-          {FIELDS.map(({ title, num, Icon }) => (
+        <ul className="grid grid-cols-1 gap-4 min-[360px]:grid-cols-2 sm:gap-5 lg:grid-cols-3">
+          {FIELDS.map(({ title, Icon }) => (
             <li
-              key={num}
-              className="group relative overflow-hidden rounded-3xl border border-brand/10 bg-gradient-to-bl from-white/90 via-rose-pale/70 to-sand-pale p-6 shadow-card transition-all duration-300 hover:-translate-y-1 hover:border-brand/30 hover:shadow-card-hover motion-reduce:transition-none motion-reduce:transform-none motion-reduce:hover:shadow-card"
+              key={title}
+              className="flex h-full flex-col items-center rounded-3xl border border-brand/15 bg-white px-4 py-6 text-center shadow-card transition-all duration-300 hover:-translate-y-0.5 hover:border-brand/30 hover:shadow-card-hover active:translate-y-0 active:scale-[0.98] sm:px-6 motion-reduce:transition-none motion-reduce:hover:transform-none motion-reduce:active:transform-none"
             >
-              <span
+              <Icon
+                className="h-10 w-10 text-brand sm:h-12 sm:w-12"
+                strokeWidth={2}
                 aria-hidden="true"
-                className="pointer-events-none absolute -bottom-10 -left-10 h-28 w-28 rounded-full bg-rose-brand/15 blur-2xl opacity-50 transition-opacity duration-300 group-hover:opacity-90 motion-reduce:transition-none"
               />
-              <div className="relative flex items-center gap-4">
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-brand/20 bg-white text-brand-deep shadow-sm transition-colors duration-300 group-hover:border-brand-dark group-hover:bg-brand group-hover:text-white motion-reduce:transition-none">
-                  <Icon className="h-6 w-6" strokeWidth={2} aria-hidden="true" />
-                </span>
-                <h3 className="min-h-14 text-base font-black leading-7 text-ink sm:text-lg">
-                  {title}
-                </h3>
-              </div>
-              <div className="relative mt-6 flex items-center gap-3">
-                <span
-                  aria-hidden="true"
-                  className="h-px flex-1 bg-gradient-to-l from-transparent via-brand/25 to-brand/40"
-                />
-                <span
-                  aria-hidden="true"
-                  dir="ltr"
-                  className="text-2xl font-black tabular-nums leading-none text-brand/25 transition-colors duration-300 group-hover:text-brand/45 motion-reduce:transition-none"
-                >
-                  {num}
-                </span>
-              </div>
+              <h3 className="mt-3 text-sm font-bold leading-6 text-ink sm:mt-4 sm:text-base sm:leading-7">
+                {title}
+              </h3>
             </li>
           ))}
         </ul>
