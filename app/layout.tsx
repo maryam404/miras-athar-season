@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { handicrafts } from "./fonts";
 import PWARegister from "@/components/PWARegister";
+import FloatingActions from "@/components/FloatingActions";
 
 const BASE_PATH = process.env.PAGES_BASE_PATH || "";
 
@@ -44,6 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={`min-h-screen bg-sand-cream ${handicrafts.variable}`}>
         {children}
         <PWARegister />
+        <FloatingActions />
       </body>
     </html>
   );
