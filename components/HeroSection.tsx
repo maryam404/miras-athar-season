@@ -28,7 +28,7 @@ export default function HeroSection({ now }: { now: number }) {
 
         <p className="mx-auto mt-4 max-w-2xl text-sm font-semibold leading-8 text-white/80 sm:text-lg sm:leading-10">
           برامج وفعاليات مبادرة نون متحد 1448هـ - 2026 - 2027م
-          <br className="hidden sm:block" />
+          <br />
           بالشراكة مع جمعية علم الحج
         </p>
 
