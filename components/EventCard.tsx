@@ -70,7 +70,13 @@ export default function EventCard({
         aria-expanded={isOpen}
         aria-controls={detailsId}
         onClick={pinned ? undefined : onToggle}
-        title={pinned ? "بطاقة أقرب برنامج قادم — مثبتة مفتوحة دائمًا" : undefined}
+        title={
+          pinned
+            ? isNearest
+              ? "بطاقة البرنامج الأقرب موعدًا — مثبتة مفتوحة دائمًا"
+              : "بطاقة البرنامج مثبتة مفتوحة دائمًا حتى تت تحول إلى المنتهية"
+            : undefined
+        }
         className="flex w-full flex-col gap-4 p-5 text-start sm:p-6"
       >
         {/* badges row */}

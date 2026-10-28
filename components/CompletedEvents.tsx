@@ -24,7 +24,6 @@ export default function CompletedEvents({
           </span>
           <div>
             <h2 className="text-lg font-black text-ink sm:text-xl">البرامج المنتهية</h2>
-            <p className="text-xs font-semibold text-muted">الأحدث انتهاءً أولًا</p>
           </div>
         </div>
         <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-extrabold text-stone-500">

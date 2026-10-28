@@ -3,6 +3,8 @@
 import { useMemo, useState, useCallback, useEffect } from "react";
 import { SEASON_EVENTS } from "@/data/events";
 import {
+  getEventEndDateTime,
+  getEventStartDateTime,
   getEventStatus,
   getNearestUpcomingEventId,
   getSeasonStats,
@@ -20,6 +22,9 @@ import NearestEventSection from "@/components/NearestEventSection";
 import UpcomingEvents from "@/components/UpcomingEvents";
 import CompletedEvents from "@/components/CompletedEvents";
 import Footer from "@/components/Footer";
+
+/** مدة بقاء البرنامج مثبتًا تحت «جاري الآن» بعد نهايته (نصف ساعة). */
+const LIVE_HOLD_GRACE_MS = 30 * 60 * 1000;
 
 export default function HomePage() {
   const now = useNow(1000);
@@ -82,14 +87,37 @@ export default function HomePage() {
     () => sortLiveEvents(filtered, now),
     [filtered, now],
   );
+
+  // التثبيت المرن: يبقى البرنامج مثبتًا تحت «جاري الآن» حتى نصف ساعة بعد نهايته،
+  // وتُخفى بطاقة الأقرب موعدًا أثناء إقامة البرنامج وتعود أسفل القسم المثبت خلال فترة السماح
+  const { holdEvents, anyGrace } = useMemo(() => {
+    const liveList = sortLiveEvents(filtered, now);
+    const graceList = filtered.filter(
+      (e) => getEventStatus(e, now) === "completed" && now - getEventEndDateTime(e) < LIVE_HOLD_GRACE_MS,
+    );
+    const hold =
+      graceList.length > 0
+        ? [...liveList, ...graceList].sort((a, b) => getEventStartDateTime(a) - getEventStartDateTime(b))
+        : liveList;
+    return { holdEvents: hold, anyGrace: graceList.length > 0 };
+  }, [filtered, now]);
+
   const upcoming = useMemo(
     // في وضع الكل/اللل تُستبعد بطاقة الأقرب من القائمة لأن قسمها المثبت يعرضها (بلا تكرار)
     () => sortUpcomingEvents(filtered, now).filter((e) => !(isDefaultView && e.id === nearestUpcomingId)),
     [filtered, now, isDefaultView, nearestUpcomingId],
   );
   const completed = useMemo(
-    () => sortCompletedEvents(filtered, now),
-    [filtered, now],
+    () =>
+      sortCompletedEvents(filtered, now).filter(
+        (e) =>
+          !(
+            isDefaultView &&
+            getEventStatus(e, now) === "completed" &&
+            now - getEventEndDateTime(e) < LIVE_HOLD_GRACE_MS
+          ),
+      ),
+    [filtered, now, isDefaultView],
   );
 
   return (
@@ -108,9 +136,17 @@ export default function HomePage() {
 
       {/* إظهار القسم المطابق للفرز فقط — والبقية تُخفى كليًّا (بدون رسائل فراغ) */}
       {(isDefaultView || statusFilter === "live") && (
-        <LiveEventSection events={live} now={now} isOpen={isOpen} onToggle={toggleCard} />
+        <LiveEventSection
+          events={isDefaultView ? holdEvents : live}
+          now={now}
+          isOpen={isOpen}
+          onToggle={toggleCard}
+          pinned={isDefaultView}
+        />
       )}
-      {isDefaultView && nearestEvent && <NearestEventSection event={nearestEvent} now={now} />}
+      {isDefaultView && nearestEvent && !(holdEvents.length > 0 && !anyGrace) && (
+        <NearestEventSection event={nearestEvent} now={now} />
+      )}
       {(isDefaultView || statusFilter === "all" || statusFilter === "upcoming" || statusFilter === "nearest") && (
         <UpcomingEvents
           events={upcoming}

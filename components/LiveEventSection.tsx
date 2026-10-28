@@ -9,11 +9,13 @@ export default function LiveEventSection({
   now,
   isOpen,
   onToggle,
+  pinned,
 }: {
   events: SeasonEvent[];
   now: number;
   isOpen: (id: number) => boolean;
   onToggle: (id: number) => void;
+  pinned?: boolean;
 }) {
   if (events.length === 0) return null;
   return (
@@ -34,6 +36,7 @@ export default function LiveEventSection({
             event={e}
             now={now}
             index={i}
+            pinned={pinned}
             expanded={isOpen(e.id)}
             onToggle={() => onToggle(e.id)}
           />
