@@ -83,8 +83,9 @@ export default function HomePage() {
     [filtered, now],
   );
   const upcoming = useMemo(
-    () => sortUpcomingEvents(filtered, now),
-    [filtered, now],
+    // في وضع الكل/اللل تُستبعد بطاقة الأقرب من القائمة لأن قسمها المثبت يعرضها (بلا تكرار)
+    () => sortUpcomingEvents(filtered, now).filter((e) => !(isDefaultView && e.id === nearestUpcomingId)),
+    [filtered, now, isDefaultView, nearestUpcomingId],
   );
   const completed = useMemo(
     () => sortCompletedEvents(filtered, now),
