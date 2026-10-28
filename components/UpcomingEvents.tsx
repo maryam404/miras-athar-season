@@ -7,9 +7,15 @@ import EventCard from "./EventCard";
 export default function UpcomingEvents({
   events,
   now,
+  pinnedId,
+  isOpen,
+  onToggle,
 }: {
   events: SeasonEvent[];
   now: number;
+  pinnedId: number | null;
+  isOpen: (id: number) => boolean;
+  onToggle: (id: number) => void;
 }) {
   return (
     <section aria-label="البرامج القادمة" className="mx-auto w-full max-w-6xl px-5 pt-10 sm:px-8">
@@ -20,7 +26,7 @@ export default function UpcomingEvents({
           </span>
           <div>
             <h2 className="text-lg font-black text-ink sm:text-xl">البرامج القادمة</h2>
-            <p className="text-xs font-semibold text-muted">مرتبة من الأقرب إلى الأبعد</p>
+            <p className="text-xs font-semibold text-muted">اضغطي البطاقة لعرض التفاصيل</p>
           </div>
         </div>
         <span className="rounded-full bg-brand/[0.07] px-3 py-1 text-xs font-extrabold text-brand-deep">
@@ -35,7 +41,16 @@ export default function UpcomingEvents({
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((e, i) => (
-            <EventCard key={e.id} event={e} now={now} isNext={i === 0} index={i} />
+            <EventCard
+              key={e.id}
+              event={e}
+              now={now}
+              index={i}
+              pinned={false}
+              isNext={pinnedId !== null && e.id === pinnedId}
+              expanded={isOpen(e.id)}
+              onToggle={() => onToggle(e.id)}
+            />
           ))}
         </div>
       )}

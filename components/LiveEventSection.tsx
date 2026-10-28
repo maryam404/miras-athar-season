@@ -7,9 +7,13 @@ import EventCard from "./EventCard";
 export default function LiveEventSection({
   events,
   now,
+  isOpen,
+  onToggle,
 }: {
   events: SeasonEvent[];
   now: number;
+  isOpen: (id: number) => boolean;
+  onToggle: (id: number) => void;
 }) {
   if (events.length === 0) return null;
   return (
@@ -25,7 +29,14 @@ export default function LiveEventSection({
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {events.map((e, i) => (
-          <EventCard key={e.id} event={e} now={now} index={i} />
+          <EventCard
+            key={e.id}
+            event={e}
+            now={now}
+            index={i}
+            expanded={isOpen(e.id)}
+            onToggle={() => onToggle(e.id)}
+          />
         ))}
       </div>
     </section>

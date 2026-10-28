@@ -6,7 +6,7 @@ import type { EventStatus } from "@/data/events";
 import { cn } from "@/lib/cn";
 
 export type ExecutionFilter = "all" | "حضوري" | "عن بُعد";
-export type StatusFilter = "all" | EventStatus;
+export type StatusFilter = "all" | EventStatus | "nearest";
 
 const EXEC_OPTS: Array<{ v: ExecutionFilter; label: string }> = [
   { v: "all", label: "الكل" },
@@ -16,6 +16,7 @@ const EXEC_OPTS: Array<{ v: ExecutionFilter; label: string }> = [
 
 const STATUS_OPTS: Array<{ v: StatusFilter; label: string }> = [
   { v: "all", label: "الكل" },
+  { v: "nearest", label: "الأقرب موعدًا" },
   { v: "upcoming", label: "قادم" },
   { v: "live", label: "جاري الآن" },
   { v: "completed", label: "منتهي" },

@@ -7,9 +7,13 @@ import EventCard from "./EventCard";
 export default function CompletedEvents({
   events,
   now,
+  isOpen,
+  onToggle,
 }: {
   events: SeasonEvent[];
   now: number;
+  isOpen: (id: number) => boolean;
+  onToggle: (id: number) => void;
 }) {
   return (
     <section aria-label="البرامج المنتهية" className="mx-auto w-full max-w-6xl px-5 pt-10 sm:px-8">
@@ -35,7 +39,14 @@ export default function CompletedEvents({
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:gap-5 md:grid-cols-2 xl:grid-cols-3">
           {events.map((e, i) => (
-            <EventCard key={e.id} event={e} now={now} index={i} />
+            <EventCard
+              key={e.id}
+              event={e}
+              now={now}
+              index={i}
+              expanded={isOpen(e.id)}
+              onToggle={() => onToggle(e.id)}
+            />
           ))}
         </div>
       )}

@@ -82,6 +82,15 @@ export function withStatus(nowMs: number = Date.now()) {
   }));
 }
 
+/**
+ * أقرب برنامج قادم زمنيًا — يُحدد من مواعيد البرامج الفعلية (start لكل برنامج)
+ * لا من ترتيب الكود الثابت. يعيد null إن لم يوجد أي برنامج قادم.
+ */
+export function getNearestUpcomingEventId(nowMs: number = Date.now()): number | null {
+  const nearest = sortUpcomingEvents(SEASON_EVENTS, nowMs);
+  return nearest.length > 0 ? nearest[0].id : null;
+}
+
 export function sortUpcomingEvents(
   events: SeasonEvent[] = SEASON_EVENTS,
   nowMs: number = Date.now(),
