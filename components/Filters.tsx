@@ -11,7 +11,6 @@ export type StatusFilter = "all" | EventStatus | "nearest";
 const EXEC_OPTS: Array<{ v: ExecutionFilter; label: string }> = [
   { v: "all", label: "الكل" },
   { v: "حضوري", label: "حضوري" },
-  { v: "عن بُعد", label: "عن بُعد" },
 ];
 
 const STATUS_OPTS: Array<{ v: StatusFilter; label: string }> = [

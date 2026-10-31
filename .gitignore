@@ -13,3 +13,12 @@ Thumbs.db
 
 # Env
 .env*.local
+
+# مجلدات ومساعدات التطوير المحلية — لا تُرفع للمستودع العام
+_pub_clone/
+backups/
+local-tests/
+_*
+!_next/**
+tsconfig.tsbuildinfo
+logo-new.png.png

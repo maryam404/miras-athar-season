@@ -25,18 +25,26 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: npm
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build static site
+      - name: Determine base path
+        id: base
         run: |
-          echo "BASE_DEBUG=[$PAGES_BASE_PATH]"
-          npm run build
-          grep -o '"assetPrefix":"[^"]*"' out/index.html | head -1
-          grep -o 'href="[^"]*.css"' out/index.html | head -1
+          REPO="${GITHUB_REPOSITORY#*/}"
+          OWNER="${GITHUB_REPOSITORY%/*}"
+          if [ "$REPO" = "$OWNER.github.io" ]; then
+            echo "path=" >> "$GITHUB_OUTPUT"
+          else
+            echo "path=/$REPO" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build static site
+        run: npm run build
         env:
-          PAGES_BASE_PATH: /miras-athar-season
+          PAGES_BASE_PATH: ${{ steps.base.outputs.path }}
 
       - name: Add .nojekyll
         run: touch out/.nojekyll

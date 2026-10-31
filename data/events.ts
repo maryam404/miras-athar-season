@@ -11,26 +11,35 @@ export interface SeasonEvent {
   startTime: string; // "17:00"
   endTime: string; // "20:00"
   execution: ExecutionType;
+  /** رابط Zoom لهذا البرنامج — تُدرجه المشرفة عند تجهيز الموعد. غيابه يعطّل زر الدخول ولا يُخترع رابط أبدًا. */
+  zoomLink?: string;
+  /** رابط التقييم مستقل تمامًا عن Zoom والتأكيد؛ يُفتح خلال نافذته: قبل نهاية البرنامج بـ15 دقيقة حتى بعد نهايته بـ60 دقيقة (قرار المشرفة 2026-10-31). */
+  evaluationLink?: string;
 }
 
 export const TIMEZONE = "Asia/Riyadh" as const;
+
+/** رابط Zoom الموحد المعتمد للقاءات الموسم (قرار المشرفة 2026-10-29) — يُعتمد لكل البرامج. */
+export const SEASON_ZOOM_LINK =
+  "https://us02web.zoom.us/j/81533178071?pwd=cavA7W2aGpK9dYdWdPSCAQASgbwAue.1";
+
 export const SEASON_EVENTS: SeasonEvent[] = [
-  { id: 1, title: "تعارف وعرض الخطة السنوية والبرامج", type: "احتفال", hijriDate: "1448/4/1", gregorianDate: "2026-09-12", displayGregorianDate: "12 سبتمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 2, title: "وطن يخدم هويتنا في خدمة ضيوف الرحمن", type: "احتفال", hijriDate: "1448/4/22", gregorianDate: "2026-10-03", displayGregorianDate: "3 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 3, title: "صوت الحاج - قراءة في تجربة ضيف الرحمن خلال الموسم", type: "أمسية", hijriDate: "1448/5/6", gregorianDate: "2026-10-17", displayGregorianDate: "17 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 4, title: "القيادة الرحيمة: حين يجتمع الحزم بالاحتواء", type: "لقاء مفتوح", hijriDate: "1448/5/13", gregorianDate: "2026-10-24", displayGregorianDate: "24 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 5, title: "المشرفة الملهمة.. قيادة تصنع الاثر", type: "أمسية", hijriDate: "1448/5/27", gregorianDate: "2026-11-07", displayGregorianDate: "7 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 6, title: "مبادرات صنعت أثراً في موسم الحج", type: "لقاء مفتوح", hijriDate: "1448/6/18", gregorianDate: "2026-11-28", displayGregorianDate: "28 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 7, title: "تكامل فرق العمل في موسم الحج", type: "ندوة", hijriDate: "1448/7/3", gregorianDate: "2026-12-12", displayGregorianDate: "12 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 8, title: "الشورى وصناعة القرار في فرق العمل الميدانية", type: "فعالية", hijriDate: "1448/11/3", gregorianDate: "2027-04-10", displayGregorianDate: "10 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 9, title: "ملتقى الخبرات في تقديم الخدمات المميزة - شركات حجاج الداخل - الأقسام النسائية موسم 1448هـ", type: "نقل تجربة", hijriDate: "1448/7/24", gregorianDate: "2027-01-02", displayGregorianDate: "2 يناير 2027", startTime: "10:00", endTime: "16:00", execution: "حضوري" },
-  { id: 10, title: "الابتكار والحلول والتحديات وفرص التحسين", type: "ندوة", hijriDate: "1448/8/8", gregorianDate: "2027-01-16", displayGregorianDate: "16 يناير 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 11, title: "التواصل الفعال وأثره في جودة الخدمة خلال الموسم", type: "ندوة", hijriDate: "1448/8/22", gregorianDate: "2027-01-30", displayGregorianDate: "30 يناير 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 12, title: "الإحسان قيمة مهنية في خدمة ضيوف الرحمن", type: "أمسية", hijriDate: "1448/9/6", gregorianDate: "2027-02-13", displayGregorianDate: "13 فبراير 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 13, title: "عيد نون متحد - لقاء العيد في الحج", type: "احتفال", hijriDate: "1448/10/12", gregorianDate: "2027-03-20", displayGregorianDate: "20 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 14, title: "لماذا تنهار فرق الموسم؟ تحديات بناء الفريق واستدامته", type: "ورشة", hijriDate: "1448/10/19", gregorianDate: "2027-03-27", displayGregorianDate: "27 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 15, title: "القيادة الميدانية من منظور فريق التنفيذ", type: "ندوة", hijriDate: "1448/10/26", gregorianDate: "2027-04-03", displayGregorianDate: "3 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 16, title: "تطبيقات الذكاء الاصطناعي في تطوير خدمات الحج وتحسين تجربة المستفيد", type: "ورشة", hijriDate: "1448/7/17", gregorianDate: "2026-12-26", displayGregorianDate: "26 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري" },
-  { id: 17, title: "إدارة الخلاف والمسؤولية تحت ضغط الموسم", type: "ندوة", hijriDate: "1448/11/10", gregorianDate: "2027-04-17", displayGregorianDate: "17 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
-  { id: 18, title: "جاهزية المرافق والخدمات في موسم الحج (تحديات وحلول)", type: "لقاء مفتوح", hijriDate: "1448/11/17", gregorianDate: "2027-04-24", displayGregorianDate: "24 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد" },
+  { id: 1, title: "تعارف وعرض الخطة السنوية والبرامج", type: "احتفال", hijriDate: "1448/4/1", gregorianDate: "2026-09-12", displayGregorianDate: "12 سبتمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 2, title: "وطن يخدم هويتنا في خدمة ضيوف الرحمن", type: "احتفال", hijriDate: "1448/4/22", gregorianDate: "2026-10-03", displayGregorianDate: "3 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 3, title: "صوت الحاج - قراءة في تجربة ضيف الرحمن خلال الموسم", type: "أمسية", hijriDate: "1448/5/6", gregorianDate: "2026-10-17", displayGregorianDate: "17 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 4, title: "القيادة الرحيمة: حين يجتمع الحزم بالاحتواء", type: "لقاء مفتوح", hijriDate: "1448/5/13", gregorianDate: "2026-10-24", displayGregorianDate: "24 أكتوبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 5, title: "المشرفة الملهمة.. قيادة تصنع الاثر", type: "أمسية", hijriDate: "1448/5/27", gregorianDate: "2026-11-07", displayGregorianDate: "7 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK, evaluationLink: "https://forms.gle/egWHzQgwBBFiranW6" },
+  { id: 6, title: "مبادرات صنعت أثراً في موسم الحج", type: "لقاء مفتوح", hijriDate: "1448/6/18", gregorianDate: "2026-11-28", displayGregorianDate: "28 نوفمبر 2026", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 7, title: "تكامل فرق العمل في موسم الحج", type: "ندوة", hijriDate: "1448/7/3", gregorianDate: "2026-12-12", displayGregorianDate: "12 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 8, title: "الشورى وصناعة القرار في فرق العمل الميدانية", type: "فعالية", hijriDate: "1448/11/3", gregorianDate: "2027-04-10", displayGregorianDate: "10 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 9, title: "ملتقى الخبرات في تقديم الخدمات المميزة - شركات حجاج الداخل - الأقسام النسائية موسم 1448هـ", type: "نقل تجربة", hijriDate: "1448/7/24", gregorianDate: "2027-01-02", displayGregorianDate: "2 يناير 2027", startTime: "10:00", endTime: "16:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 10, title: "الابتكار والحلول والتحديات وفرص التحسين", type: "ندوة", hijriDate: "1448/8/8", gregorianDate: "2027-01-16", displayGregorianDate: "16 يناير 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 11, title: "التواصل الفعال وأثره في جودة الخدمة خلال الموسم", type: "ندوة", hijriDate: "1448/8/22", gregorianDate: "2027-01-30", displayGregorianDate: "30 يناير 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 12, title: "الإحسان قيمة مهنية في خدمة ضيوف الرحمن", type: "أمسية", hijriDate: "1448/9/6", gregorianDate: "2027-02-13", displayGregorianDate: "13 فبراير 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 13, title: "عيد نون متحد - لقاء العيد في الحج", type: "احتفال", hijriDate: "1448/10/12", gregorianDate: "2027-03-20", displayGregorianDate: "20 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 14, title: "لماذا تنهار فرق الموسم؟ تحديات بناء الفريق واستدامته", type: "ورشة", hijriDate: "1448/10/19", gregorianDate: "2027-03-27", displayGregorianDate: "27 مارس 2027", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 15, title: "القيادة الميدانية من منظور فريق التنفيذ", type: "ندوة", hijriDate: "1448/10/26", gregorianDate: "2027-04-03", displayGregorianDate: "3 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 16, title: "تطبيقات الذكاء الاصطناعي في تطوير خدمات الحج وتحسين تجربة المستفيد", type: "ورشة", hijriDate: "1448/7/17", gregorianDate: "2026-12-26", displayGregorianDate: "26 ديسمبر 2026", startTime: "17:00", endTime: "20:00", execution: "حضوري", zoomLink: SEASON_ZOOM_LINK },
+  { id: 17, title: "إدارة الخلاف والمسؤولية تحت ضغط الموسم", type: "ندوة", hijriDate: "1448/11/10", gregorianDate: "2027-04-17", displayGregorianDate: "17 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
+  { id: 18, title: "جاهزية المرافق والخدمات في موسم الحج (تحديات وحلول)", type: "لقاء مفتوح", hijriDate: "1448/11/17", gregorianDate: "2027-04-24", displayGregorianDate: "24 أبريل 2027", startTime: "17:00", endTime: "20:00", execution: "عن بُعد", zoomLink: SEASON_ZOOM_LINK },
 ];

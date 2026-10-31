@@ -187,3 +187,68 @@ export function formatEventDuration(event: SeasonEvent): string {
   const hours = Math.round((e.h * 60 + e.m - (s.h * 60 + s.m)) / 60);
   return `(${hours} ساعات)`;
 }
+
+// ====================== العدّاد المختصر وشريط التقدم ======================
+
+/** تقسيم المتبقي (قبل البداية) إلى أيام/ساعات/دقائق كأرقام — لا ثوانٍ ولا أرقام سالبة (تقريب لأسفل). */
+export function splitRemainingDHM(
+  totalMs: number,
+): { days: number; hours: number; minutes: number } {
+  const totalMinutes = Math.max(0, Math.floor(totalMs / 60_000));
+  const days = Math.floor(totalMinutes / 1440);
+  const hours = Math.floor((totalMinutes % 1440) / 60);
+  const minutes = totalMinutes % 60;
+  return { days, hours, minutes };
+}
+
+/** تقسيم المتبقي (أثناء البرنامج) إلى ساعات تراكمية + دقائق — لا ثوانٍ ولا أرقام سالبة. */
+export function splitRemainingHM(totalMs: number): { hours: number; minutes: number } {
+  const totalMinutes = Math.max(0, Math.floor(totalMs / 60_000));
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return { hours, minutes };
+}
+
+/**
+ * نسبة تقدم زمني خلال مدة البرنامج نفسها (من بدايته إلى نهايته).
+ * المعادلة الموثقة: (الآن − البداية) ÷ (النهاية − البداية) مضبوطة ضمن [0..1]
+ * دائمًا — 0 من لحظة البداية و1 عند النهاية وما بعدها، بلا أرقام سالبة.
+ */
+export function getEventProgressDuring(
+  event: SeasonEvent,
+  nowMs: number = Date.now(),
+): number {
+  const start = getEventStartDateTime(event);
+  const end = getEventEndDateTime(event);
+  const span = end - start;
+  if (span <= 0) return nowMs >= end ? 1 : 0;
+  const done = Math.min(Math.max(nowMs - start, 0), span);
+  return done / span;
+}
+
+/**
+ * نسبة التقدم الزمني حتى بداية البرنامج (شريط رفيع داخل البطاقة).
+ * المعادلة الموثقة (بلا نسب مضللة): النطاق من نهاية أقرب برنامج سابق
+ * (أقصى نهاية تنتهي قبل بداية هذا البرنامج في سجل البرامج نفسه، بلا بيانات
+ * مُخترعة) إلى بداية هذا البرنامج. ولأول برنامج — لا سابق له — نطاق موثّق ثابت
+ * هو 30 يومًا قبل بدايته. الناتج مضبوط ضمن [.. 1] دائمًا و0 عند نقص البيانات.
+ */
+export const FIRST_EVENT_PROGRESS_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
+
+export function getEventProgressTowardStart(
+  event: SeasonEvent,
+  nowMs: number = Date.now(),
+): number {
+  const start = getEventStartDateTime(event);
+  let origin: number | null = null;
+  for (const other of SEASON_EVENTS) {
+    if (other.id === event.id) continue;
+    const otherEnd = getEventEndDateTime(other);
+    if (otherEnd < start && (origin === null || otherEnd > origin)) origin = otherEnd;
+  }
+  if (origin === null) origin = start - FIRST_EVENT_PROGRESS_WINDOW_MS;
+  const span = start - origin;
+  if (span <= 0) return nowMs >= start ? 1 : 0;
+  const done = Math.min(Math.max(nowMs - origin, 0), span);
+  return done / span;
+}

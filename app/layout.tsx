@@ -3,6 +3,7 @@ import "./globals.css";
 import { handicrafts } from "./fonts";
 import PWARegister from "@/components/PWARegister";
 import FloatingActions from "@/components/FloatingActions";
+import { EXPORT_NOW_MS } from "@/lib/build-stamp";
 
 const BASE_PATH = process.env.PAGES_BASE_PATH || "";
 
@@ -43,6 +44,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body className={`min-h-screen bg-sand-cream ${handicrafts.variable}`}>
+        {/* طابع لحظة التصدير يُقرأ من أول رسم عميل فتتطابق الإمااعة حرفيًا (ثابت داخل HTML نفسه). */}
+        <script dangerouslySetInnerHTML={{ __html: `window.__MIRAS_NOW__=${EXPORT_NOW_MS};` }} />
         {children}
         <PWARegister />
         <FloatingActions />

@@ -40,5 +40,5 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add public/icon-512.png public/icon-192.png public/apple-touch-icon.png
           git diff --cached --quiet && echo "NO Changes" && exit 0
-          git commit -m "إضافة أيقونات PWA فكّ تشفيرها من base64"
+          git commit -m "إضافة أيقونات PWA (192-512-apple) فكّ تشفير من base64"
           git push

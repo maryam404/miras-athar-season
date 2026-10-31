@@ -77,7 +77,7 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
-          className="pointer-events-auto relative w-[min(92vw,24rem)] rounded-3xl bg-white p-6 shadow-card-hover outline-none animate-fade-up motion-reduce:animate-none"
+          className="pointer-events-auto relative max-h-[92vh] w-[min(92vw,24rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-card-hover outline-none animate-fade-up motion-reduce:animate-none"
         >
           <button
             type="button"
