@@ -20,6 +20,13 @@ type Props = {
 export default function InstallModal({ open, title, onClose, children }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
+  // مرجع الأحدث: التأثير يُثبَّت على [open] فقط، فلا يُعاد تركيزه ولا تسريب تركيز
+  // مع أي إعادة رسم للصفحة (الهويات الدالية المتغيرة في onCancel بين الرسومات).
+  const onCloseRef = useRef(onClose);
+
+  useEffect(() => {
+    onCloseRef.current = onClose;
+  });
 
   useEffect(() => {
     if (!open) return;
@@ -33,7 +40,7 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         e.preventDefault();
-        onClose();
+        onCloseRef.current();
         return;
       }
       if (e.key === "Tab" && panel) {
@@ -60,7 +67,8 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
       const toRestore = lastFocused.current;
       if (toRestore && toRestore.isConnected) toRestore.focus({ preventScroll: true });
     };
-  }, [open, onClose]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   if (!open) return null;
 
