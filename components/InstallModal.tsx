@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useRef } from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 type Props = {
@@ -10,11 +10,18 @@ type Props = {
   children: ReactNode;
 };
 
+/** مستطيل منطقة العرض المرئية على الجوال (visualViewport) — يقيس ما يظهر فوق لوحة المفاتيح فعليًا. */
+type VVRect = { top: number; left: number; width: number; height: number };
+
+const MOBILE_MAX = 767;
+
 /**
  * نافذة حوارية أنيقة بلون الموقع وخطوطه:
  * - تُغلق بـ Escape أو بالنقر خارج النافذة أو زر الإغلاق.
  * - تمنع تمرير الخلفية أثناء فتحها.
  * - تدعم لوحة المفاتيح (احتواء Tab داخل النافذة + إعادة تركيز عند الإغلاق).
+ * - على الجوال: النافذة تبقى مدمجة بحجمها وبحوافها الدائرية فوقَ لوحة المفاتيح عبر visualViewport،
+ *   ومحتواها قابل للتمرير داخليًا دون تغيير أي شيء على الكمبيوتر.
  * - لا تُعرض تلقائياً؛ تُفتح من زر التثبيت فقط.
  */
 export default function InstallModal({ open, title, onClose, children }: Props) {
@@ -23,10 +30,36 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
   // مرجع الأحدث: التأثير يُثبَّت على [open] فقط، فلا يُعاد تركيزه ولا تسريب تركيز
   // مع أي إعادة رسم للصفحة (الهويات الدالية المتغيرة في onCancel بين الرسومات).
   const onCloseRef = useRef(onClose);
+  // منطقة العرض المرئية على الجوال فقط (لا شيء على الكمبيوتر): تُقاس لحظة فتح النافذة وكل تغيّر.
+  const [vv, setVv] = useState<VVRect | null>(null);
 
   useEffect(() => {
     onCloseRef.current = onClose;
   });
+
+  // تتبع visualViewport قيد فتح النافذة فقط — بلا أي مساس بالتركيز أو بلوحة المفاتيح.
+  useEffect(() => {
+    if (!open) {
+      setVv(null);
+      return;
+    }
+    const vvp = window.visualViewport;
+    if (!vvp) return; // بيئة بلا visualViewport (كمبيوتر قديم): السلوك السابق كما هو
+    const update = () => {
+      if (window.innerWidth <= MOBILE_MAX) {
+        setVv({ top: vvp.offsetTop, left: vvp.offsetLeft, width: vvp.width, height: vvp.height });
+      } else {
+        setVv(null);
+      }
+    };
+    update();
+    vvp.addEventListener("resize", update);
+    vvp.addEventListener("scroll", update);
+    return () => {
+      vvp.removeEventListener("resize", update);
+      vvp.removeEventListener("scroll", update);
+    };
+  }, [open]);
 
   useEffect(() => {
     if (!open) return;
@@ -72,8 +105,19 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
 
   if (!open) return null;
 
+  const rootStyle = vv
+    ? { position: "fixed" as const, top: vv.top, left: vv.left, width: vv.width, height: vv.height }
+    : undefined;
+  const panelStyle = vv ? { maxHeight: Math.floor(vv.height * 0.92) } : undefined;
+
   return (
-    <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={title}>
+    <div
+      className={vv ? "fixed z-[60]" : "fixed inset-0 z-[60]"}
+      style={rootStyle}
+      role="dialog"
+      aria-modal="true"
+      aria-label={title}
+    >
       {/* الخلفية: النقر خارج النافذة يغلقها */}
       <div
         aria-hidden="true"
@@ -85,6 +129,7 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
+          style={panelStyle}
           className="pointer-events-auto relative max-h-[92vh] w-[min(92vw,24rem)] overflow-y-auto rounded-3xl bg-white p-6 shadow-card-hover outline-none animate-fade-up motion-reduce:animate-none"
         >
           <button
@@ -102,3 +147,4 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
     </div>
   );
 }
+
