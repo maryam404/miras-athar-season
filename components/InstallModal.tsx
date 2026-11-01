@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useRef, useState } from "react";
+import { ReactNode, useCallback, useEffect, useRef, useState } from "react";
 import { X } from "lucide-react";
 
 type Props = {
@@ -68,30 +68,34 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
     };
   }, [open]);
 
-  // إبقاء الحقل النشط مرئيًا بالتمرير الداخلي **بالمقدار اللازم فقط** (مستوى الجسم الداخلي للنافذة):
-  // لا scrollIntoView إطلاقًا (ينتشر في iPhone إلى مستند الصفحة فيُزاح كل شيء = الرقصة أعلى/أسفل)،
-  // بل ضبط scrollTop للجسم مباشرة ولمستند غير قابل للتمرير أصلًا — بلا تحريك مركز ولا اهتزاز.
-  useEffect(() => {
-    if (vv == null) return;
+  // إظهار الحقل النشط بالتمرير الداخلي **بالمقدار اللازم فقط** (مستوى جسم النافذة):
+  // ضبط scrollTop للجسم مباشرة — لا scrollIntoView إطلاقًا (ينتشر في iPhone إلى
+  // مستند الصفحة فيُزاح كل شيء = الرقصة أعلى/أسفل) ولا تحريك النافذة نفسها مطلقًا.
+  const revealActive = useCallback(() => {
     const body = bodyRef.current;
     const el = document.activeElement as HTMLElement | null;
-    if (body && el && body.contains(el)) {
-      requestAnimationFrame(() => {
-        const br = body.getBoundingClientRect();
-        const er = el.getBoundingClientRect();
-        const pad = 8;
-        try {
-          if (er.top < br.top + pad) {
-            body.scrollTop -= br.top + pad - er.top;
-          } else if (er.bottom > br.bottom - pad) {
-            body.scrollTop += er.bottom - (br.bottom - pad);
-          }
-        } catch {
-          /* بيئة قديمة: تجاهل */
+    if (!body || !el || !body.contains(el)) return;
+    requestAnimationFrame(() => {
+      const br = body.getBoundingClientRect();
+      const er = el.getBoundingClientRect();
+      const pad = 8;
+      try {
+        if (er.top < br.top + pad) {
+          body.scrollTop -= br.top + pad - er.top;
+        } else if (er.bottom > br.bottom - pad) {
+          body.scrollTop += er.bottom - (br.bottom - pad);
         }
-      });
-    }
-  }, [vv]);
+      } catch {
+        /* بيئة قديمة: تجاهل */
+      }
+    });
+  }, []);
+
+  // مع أي تقلّص في المنطقة المرئية (فتح/إغلاق اللوحة) نُعيد بإظهار الحقل النشط.
+  useEffect(() => {
+    if (vv == null) return;
+    revealActive();
+  }, [vv, revealActive]);
 
   useEffect(() => {
     if (!open) return;
@@ -101,6 +105,31 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
 
     const prevOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    // قفل تمرير الصفحة الخلفية على الجذرين: iOS قد يسحب مستند الصفحة نفسه عند فتح
+    // اللوحة (بان على scrollY) فيمضي الطبقة الثابتة كلها خارج الشاشة — القفل الأعمق
+    // يمنع ذلك في العادة، ومصحح السحب أدناه يعيد أي تجاوز إلى (0,0) فورًا.
+    const prevHtmlOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+
+    // مصحح السحب: أي سحب للمستند أثناء فتح النافذة (بان iOS الأصلي أو غيره) يُعاد
+    // فورًا إلى (0,0) بتمرير لحظي — فوري حتى مع CSS خاص بالتمرير السلس،
+    // ولا يقفل الكيبورد ولا يفقد تركيز الحقل.
+    const onScrollSnap = () => {
+      if (window.scrollY !== 0 || window.scrollX !== 0) {
+        const root = document.documentElement;
+        const prev = root.style.scrollBehavior;
+        root.style.scrollBehavior = "auto";
+        root.scrollTop = 0;
+        root.scrollLeft = 0;
+        if (prev) root.style.scrollBehavior = prev;
+        else root.style.removeProperty("scroll-behavior");
+      }
+    };
+    window.addEventListener("scroll", onScrollSnap, { passive: true });
+
+    // عند كل تركيز على حقل: إظهاره داخل الجسم بالتمرير الداخلي فقط (لا تحريك النافذة).
+    const onPanelFocus = () => revealActive();
+    document.addEventListener("focusin", onPanelFocus);
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
@@ -128,6 +157,9 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
     document.addEventListener("keydown", onKey);
     return () => {
       document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScrollSnap);
+      document.removeEventListener("focusin", onPanelFocus);
+      document.documentElement.style.overflow = prevHtmlOverflow;
       document.body.style.overflow = prevOverflow;
       const toRestore = lastFocused.current;
       if (toRestore && toRestore.isConnected) toRestore.focus({ preventScroll: true });
