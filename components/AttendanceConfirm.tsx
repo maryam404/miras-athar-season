@@ -229,7 +229,7 @@ export default function AttendanceConfirm({
             maxLength={100}
             placeholder="الاسم الثلاثي"
             className={cn(
-              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-sm font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60",
+              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-base font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60 sm:text-sm",
               fieldErrors.name ? "mb-1" : "mb-3",
             )}
           />
@@ -253,7 +253,7 @@ export default function AttendanceConfirm({
             maxLength={10}
             placeholder="05XXXXXXXX"
             className={cn(
-              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-left text-sm font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60",
+              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-left text-base font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60 sm:text-sm",
               fieldErrors.phone ? "mb-1" : "mb-3",
             )}
           />
@@ -277,7 +277,7 @@ export default function AttendanceConfirm({
             maxLength={120}
             placeholder="name@example.com"
             className={cn(
-              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-left text-sm font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60",
+              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-left text-base font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60 sm:text-sm",
               fieldErrors.email ? "mb-1" : "mb-3",
             )}
           />
@@ -299,7 +299,7 @@ export default function AttendanceConfirm({
             maxLength={120}
             placeholder="اسم الشركة أو الجهة التي تعملين بها"
             className={cn(
-              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-sm font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60",
+              "w-full rounded-2xl border border-sand bg-white px-4 py-2.5 text-base font-semibold text-ink outline-none transition-colors placeholder:text-muted/60 focus:border-brand focus:ring-2 focus:ring-brand-pale disabled:opacity-60 sm:text-sm",
               fieldErrors.org ? "mb-1" : "mb-3",
             )}
           />
