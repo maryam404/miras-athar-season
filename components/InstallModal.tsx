@@ -21,21 +21,23 @@ const MOBILE_MAX = 767;
  * - تُغلق بـ Escape أو بالنقر خارج النافذة أو زر الإغلاق.
  * - تمنع تمرير الخلفية أثناء فتحها.
  * - تدعم لوحة المفاتيح (احتواء Tab داخل النافذة + إعادة تركيز عند الإغلاق).
- * - على الجوال: النافذة تبقى متمركزة أفقيًا داخل عرض الشاشة دائمًا (fixed inset-0 بلا أي إحداثيات
- *   من visualViewport — لا انزياح ولا قصّ على iPhone Safari)، ولوحة المفاتيح تقلّص ارتفاع المحتوى
- *   المتاح فقط (سقف ارتفاع + تمرير داخلي رأسي) مع إبقاء الحقل النشط مرئيًا،
- *   ومحتواها قابل للتمرير داخليًا دون تغيير أي شيء على الكمبيوتر.
+ * - على الجوال: النافذة تبقى بارتفاعها الطبيعي ونفس عرضها وهوامشها وحوافها في كل الحالات
+ *   (fixed inset-0 بلا أي إحداثيات أو سقف مشتق من visualViewport)؛ عند ظهور لوحة المفاتيح
+ *   تثبت أعلى الشاشة بنفس الهوامش (تبقى منبثقة ولا تتحول إلى صفحة كاملة) مع تمرير داخلي رأسي
+ *   للمحتوى فقط عند ضاقت المساحة، مع إبقاء الحقل النشط مرئيًا ودون أي تغيير على الكمبيوتر.
  * - لا تُعرض تلقائياً؛ تُفتح من زر التثبيت فقط.
  */
 export default function InstallModal({ open, title, onClose, children }: Props) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
   const lastFocused = useRef<HTMLElement | null>(null);
   // مرجع الأحدث: التأثير يُثبَّت على [open] فقط، فلا يُعاد تركيزه ولا تسريب تركيز
   // مع أي إعادة رسم للصفحة (الهويات الدالية المتغيرة في onCancel بين الرسومات).
   const onCloseRef = useRef(onClose);
-  // أبعاد منطقة العرض المرئية على الجوال فقط (لا شيء على الكمبيوتر):
-  // تُستخدم لسقف ارتفاع المحتوى فوق لوحة المفاتيح فقط — لا لتحديد موضع النافذة.
+  // أبعاد منطقة العرض المرئية على الجوال فقط (لا شيء على الكمبيوتر)، مع خط الأساس المرصود
+  // لحظة فتح النافذة: تعمل كاشفًا لظهور لوحة المفاتيح (انكماش المنطقة المرئية) لا مقيّدًا لأبعاد النافذة.
   const [vv, setVv] = useState<VVSize | null>(null);
+  const baselineHeightRef = useRef<number | null>(null);
 
   useEffect(() => {
     onCloseRef.current = onClose;
@@ -46,12 +48,14 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
   useEffect(() => {
     if (!open) {
       setVv(null);
+      baselineHeightRef.current = null;
       return;
     }
     const vvp = window.visualViewport;
     if (!vvp) return; // بيئة بلا visualViewport (كمبيوتر قديم): السلوك السابق كما هو
     const update = () => {
       if (window.innerWidth <= MOBILE_MAX) {
+        if (baselineHeightRef.current == null) baselineHeightRef.current = vvp.height;
         setVv({ width: vvp.width, height: vvp.height });
       } else {
         setVv(null);
@@ -64,16 +68,24 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
     };
   }, [open]);
 
-  // إبقاء الحقل النشط داخل النافذة عند تقلّص الارتفاع المتاح (فتح اللوحة):
-  // تمرير داخلي لمحتوى النافذة فقط — موضع النافذة نفسها لا يُعدَّل مطلقًا (لا translate ولا top/left).
+  // إبقاء الحقل النشط مرئيًا بالتمرير الداخلي **بالمقدار اللازم فقط** (مستوى الجسم الداخلي للنافذة):
+  // لا scrollIntoView إطلاقًا (ينتشر في iPhone إلى مستند الصفحة فيُزاح كل شيء = الرقصة أعلى/أسفل)،
+  // بل ضبط scrollTop للجسم مباشرة ولمستند غير قابل للتمرير أصلًا — بلا تحريك مركز ولا اهتزاز.
   useEffect(() => {
     if (vv == null) return;
-    const panel = panelRef.current;
+    const body = bodyRef.current;
     const el = document.activeElement as HTMLElement | null;
-    if (panel && el && panel.contains(el)) {
+    if (body && el && body.contains(el)) {
       requestAnimationFrame(() => {
+        const br = body.getBoundingClientRect();
+        const er = el.getBoundingClientRect();
+        const pad = 8;
         try {
-          el.scrollIntoView({ block: "center" });
+          if (er.top < br.top + pad) {
+            body.scrollTop -= br.top + pad - er.top;
+          } else if (er.bottom > br.bottom - pad) {
+            body.scrollTop += er.bottom - (br.bottom - pad);
+          }
         } catch {
           /* بيئة قديمة: تجاهل */
         }
@@ -125,12 +137,19 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
 
   if (!open) return null;
 
-  // الجوال فقط: سقف ارتفاع المحتوى فوق لوحة المفاتيح + سقف عرض ملاذ آمن ضد أي تكبير (pinch)
-  // — لا تُلمس مواضع top/left إطلاقًا: التمركز الأفقي يبقى لـ CSS (grid place-items-center) وحده.
+  // كشف ظهور لوحة المفاتيح على الجوال: المنطقة المرئية انكمشت كثيرًا عن خط الأساس (≥80px)
+  // — يعمل مع نموذج iOS (بان لا يغيّر innerHeight) ونموذج أندرويد (تغيير innerHeight) معًا.
+  const keyboardOpen =
+    vv != null && baselineHeightRef.current != null && vv.height < baselineHeightRef.current - 80;
+
+  // سقف عرض ملاذ آمن ضد أي تكبير يدوي خارجي (pinch) — لا يتفعل في الاستخدام العادي إطلاقًا،
+  // ولا تُكتب أي أبعاد/مواضع إطلاقًا: الارتفاع الطبيعي للنافذة والتمركز الكلي يجريان من CSS وحده.
   const panelStyle =
-    vv != null
-      ? { maxHeight: Math.max(240, Math.floor(vv.height * 0.92)), maxWidth: Math.floor(vv.width) }
-      : undefined;
+    vv != null && keyboardOpen
+      ? { maxHeight: Math.max(240, Math.floor(vv.height - 32)), maxWidth: Math.floor(vv.width) }
+      : vv != null
+        ? { maxWidth: Math.floor(vv.width) }
+        : undefined;
 
   return (
     <div className="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label={title}>
@@ -140,13 +159,22 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
         onClick={onClose}
         className="absolute inset-0 bg-ink/40 backdrop-blur-[2px] motion-reduce:backdrop-blur-none"
       />
-      <div className="pointer-events-none absolute inset-0 grid place-items-center p-4">
+      {/* التمركز الأفقي دوماً؛ ومع لوحة المفاتيح تثبت أعلى الشاشة (بنفس الهوامش) لتبقى
+          النافذة بارتفاعها الطبيعي منبثقة — وليست بضغطها لتملأ كل المساحة المتبقية —
+          والمحتوى الأطول من المساحة يُقرأ بالتمرير الداخلي رأسياً فقط. */}
+      <div
+        className={
+          keyboardOpen
+            ? "pointer-events-none absolute inset-0 grid items-start justify-items-center p-4"
+            : "pointer-events-none absolute inset-0 grid place-items-center p-4"
+        }
+      >
         <div
           ref={panelRef}
           tabIndex={-1}
           onClick={(e) => e.stopPropagation()}
           style={panelStyle}
-          className="pointer-events-auto relative max-h-[92vh] w-[min(92vw,24rem)] overflow-y-auto overflow-x-hidden rounded-3xl bg-white p-6 shadow-card-hover outline-none animate-fade-up motion-reduce:animate-none"
+          className="pointer-events-auto relative flex max-h-[92vh] w-[min(92vw,24rem)] flex-col overflow-hidden rounded-3xl bg-white p-6 shadow-card-hover outline-none animate-fade-up motion-reduce:animate-none"
         >
           <button
             type="button"
@@ -156,8 +184,12 @@ export default function InstallModal({ open, title, onClose, children }: Props) 
           >
             <X size={18} strokeWidth={2.5} aria-hidden="true" />
           </button>
-          {title ? <h2 className="mb-2 pe-8 text-xl font-black text-brand-deep">{title}</h2> : null}
-          {children}
+          {title ? <h2 className="mb-2 shrink-0 pe-8 text-xl font-black text-brand-deep">{title}</h2> : null}
+          {/* bodyRef: منطقة التمرير الرأسي الداخلية الوحيدة — المحتوى يتحرك داخليًا بالقدر اللازم فقط، */}
+          {/* والرأس (زر الإغلاق + العنوان) ثابت خارجها فلا يخرج أعلى الشاشة إطلاقًا. */}
+          <div ref={bodyRef} className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+            {children}
+          </div>
         </div>
       </div>
     </div>
