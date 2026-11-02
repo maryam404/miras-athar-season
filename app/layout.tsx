@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { handicrafts } from "./fonts";
 import PWARegister from "@/components/PWARegister";
+import VisitTracker from "@/components/VisitTracker";
 import FloatingActions from "@/components/FloatingActions";
 import { EXPORT_NOW_MS } from "@/lib/build-stamp";
 
@@ -48,6 +49,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: `window.__MIRAS_NOW__=${EXPORT_NOW_MS};` }} />
         {children}
         <PWARegister />
+        <VisitTracker />
         <FloatingActions />
       </body>
     </html>
