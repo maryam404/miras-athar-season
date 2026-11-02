@@ -7,7 +7,7 @@ import type { SeasonEvent } from "@/data/events";
 import { checkAttendanceStatus, getZoomPhase, isRegistrationOpen } from "@/lib/attendance";
 import { sendZoomHit } from "@/lib/zoom-hits";
 import { formatEventDuration, formatEventTimeRange, formatTime12h, getEventEndDateTime, getEventStatus } from "@/lib/datetime";
-import { EVALUATION_UNAVAILABLE_NOTE, EVALUATION_WINDOW_ENDED_NOTE } from "@/lib/notices";
+import { EVALUATION_BEFORE_WINDOW_NOTE, EVALUATION_UNAVAILABLE_NOTE, EVALUATION_WINDOW_ENDED_NOTE } from "@/lib/notices";
 import { getEvaluationPhase } from "@/lib/evaluation";
 import { cn } from "@/lib/cn";
 import AttendanceConfirm from "./AttendanceConfirm";
@@ -59,14 +59,20 @@ export default function EventCard({
   const zoomOpen = hasZoom && zoomPhase === "open";
   const attendingOpen = isRegistrationOpen(event, now);
 
-  // نافذة التقييم (نهاية−15د .. نهاية+60د): تفتح النموذج فقط خلالها مع توفر الرابط — القرار 2026-10-31
+  // نافذة التقييم (نهاية−15د .. نهاية+60د): تفتح النموذج فقط خلالها مع توفر الرابط — القرار 2026-10-31، والتوقيت نفسه بلا أي تغيير.
+  // قرار المشرفة 2026-11-01 (النص الوحيد قبل التفعيل): «سيُتاح تقييم البرنامج بعد انتهائه. شكرًا لمشاركتِ 🌿»
+  // — ويُمنع إطلاقًا ذكر هامش التفعيل قبل النهاية (ربع ساعة) في النافذة أو أي واجهة للموقع.
   const evaluationPhase = getEvaluationPhase(event, now);
-  const evaluationOpen = Boolean(event.evaluationLink) && evaluationPhase === "open";
-  // الضغط خارج النافذة: «انتهت الفترة» بعد نافذة رابط موجود، و«غير متاح حاليًا» قبله أو بالحالات بلا رابط (في أي وقت)
+  const evaluationLinked = Boolean(event.evaluationLink);
+  const evaluationOpen = evaluationLinked && evaluationPhase === "open";
+  // الضغط خارج نافذة رابط موجود: قبل التفعيل = النص الوحيد المعتمد؛ بعد الفترة = «انتهت فترة تقييم هذا البرنامج»؛
+  // والحالات بلا رابط تبقى «التقييم غير متاح حاليًا» في أي وقت — سلوكها بلا تغيير
   const evaluationNote =
-    Boolean(event.evaluationLink) && evaluationPhase === "ended"
-      ? EVALUATION_WINDOW_ENDED_NOTE
-      : EVALUATION_UNAVAILABLE_NOTE;
+    evaluationLinked && evaluationPhase === "before_window"
+      ? EVALUATION_BEFORE_WINDOW_NOTE
+      : evaluationLinked && evaluationPhase === "ended"
+        ? EVALUATION_WINDOW_ENDED_NOTE
+        : EVALUATION_UNAVAILABLE_NOTE;
 
   /** ملاحظة Zoom المعتمدة عند عدم إتاحتها (قبل النافذة/بعد نهايتها/بلا رابط) — تُعرض بنافذة الموقع عند الضغط، والزر يبقى أزرقًا نشطًا دائمًا. */
   const zoomNoteText = !hasZoom
@@ -303,7 +309,8 @@ export default function EventCard({
 
                   {/* التقييم — الوردي المعتمد (rose.brand #DB949F) بنص وأيقونة بيضاء؛ يبقى ظاهرًا وملونًا وقابلًا للضغط في كل الحالات (قرار المشرفة 2026-10-31):
                       خلال نافذته (قبل نهاية البرنامج بـ15 دقيقة حتى بعد نهايته بـ60 دقيقة) ومع وجود رابطه يفتح النموذج مباشرة بتبويب جديد،
-                      وقبل النافذة أو بالحالات بلا رابط تفتح نافذة «التقييم غير متاح حاليًا»، وبعد النافذة «انتهت فترة تقييم هذا البرنامج» — بلا disabled ولا تمييز لوني للإغلاق */}
+                      وقبل التفعيل (مع رابط) تُفتح النافذة بالنص الوحيد المعتمد «سيُتاح تقييم البرنامج بعد انتهائه. شكرًا لمشاركتِ 🌿» (2026-11-01 — بلا أي ذكر لتوقيت التفعيل الداخلي)،
+                      وبعد النافذة «انتهت فترة تقييم هذا البرنامج»، والحالات بلا رابط تبقى «التقييم غير متاح حاليًا» كما هي — بلا disabled ولا تمييز لوني للإغلاق */}
                   {evaluationOpen ? (
                     <a
                       href={event.evaluationLink}
