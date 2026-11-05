@@ -58,11 +58,18 @@ export default function AttendanceConfirm({
   now,
   open,
   onClose,
+  /**
+   * استدعاء اختياري يُطلق مرة واحدة بعد نجاح التأكيد (أو تحديثه أو ظهور «مسجلة مسبقًا»).
+   * الغرض الوحيد: بوابة التحقق المشتركة (لفتح نافذة تقييم اللقاء أو دخول Zoom تلقائيًا بعد التأكيد الناجح)
+   * وغيابه يحفظ السلوك الحالي بلا أي تغيير.
+   */
+  onSuccess,
 }: {
   event: SeasonEvent;
   now: number;
   open: boolean;
   onClose: () => void;
+  onSuccess?: () => void;
 }) {
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
@@ -163,6 +170,11 @@ export default function AttendanceConfirm({
     }
     setResult(outcome);
     setPhase("done");
+    // نافذة التقييم (بوابة التحقق المشتركة): بعد نجاح التأكيد فقط (تسجيل جديد/تحديث/مسجلة مسبقًا) تُفتح الوجهة تلقائيًا.
+    // فشل التأكيد أو إغلاق النافذة لا يطلق شيئًا إطلاقًا.
+    if (onSuccess && (outcome.kind === "ok" || outcome.kind === "updated" || outcome.kind === "duplicate")) {
+      onSuccess();
+    }
   }
 
   const doneStyle =

@@ -1,10 +1,10 @@
 "use client";
 
-import { useId, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { CalendarDays, ChevronDown, ClipboardCheck, Clock3, MapPin, MonitorSmartphone, Sparkles, Star, Video } from "lucide-react";
 import type { SeasonEvent } from "@/data/events";
-import { checkAttendanceStatus, getZoomPhase, isRegistrationOpen } from "@/lib/attendance";
+import { checkAttendanceStatus, getZoomPhase, hasStoredConfirmation, isRegistrationOpen } from "@/lib/attendance";
 import { sendZoomHit } from "@/lib/zoom-hits";
 import { formatEventDuration, formatEventTimeRange, formatTime12h, getEventEndDateTime, getEventStatus } from "@/lib/datetime";
 import { EVALUATION_BEFORE_WINDOW_NOTE, EVALUATION_UNAVAILABLE_NOTE, EVALUATION_WINDOW_ENDED_NOTE } from "@/lib/notices";
@@ -54,14 +54,24 @@ export default function EventCard({
   const [zoomNote, setZoomNote] = useState("");
   const [zoomUnlocked, setZoomUnlocked] = useState(false);
 
+  // بوابة التحقق المشتركة للتقييم — نفس آلية Zoom بجدولها: تحقق برقم الجوال ثم نافذة «تأكيد الحضور» نفسها،
+  // وبعد نجاح التأكيد يُفتح نموذج التقييم تلقائيًا (قرار المشرفة 2026-11-05) بلا أي توقيت ظاهر.
+  const [evalPanelOpen, setEvalPanelOpen] = useState(false);
+  const [evalPhone, setEvalPhone] = useState("");
+  const [evalChecking, setEvalChecking] = useState(false);
+  const [evalNote, setEvalNote] = useState("");
+  /** مصدر فتح نافذة «تأكيد الحضور»: «reg» للتسجيل العادي/Zoom (السلوك القائم بلا تغيير) و«eval» لبوابة التقييم (الفتح التلقائي للنموذج). */
+  const confirmSourceRef = useRef("reg");
+
   const zoomPhase = getZoomPhase(event, now);
   const hasZoom = Boolean(event.zoomLink);
   const zoomOpen = hasZoom && zoomPhase === "open";
   const attendingOpen = isRegistrationOpen(event, now);
 
-  // نافذة التقييم (نهاية−15د .. نهاية+60د): تفتح النموذج فقط خلالها مع توفر الرابط — القرار 2026-10-31، والتوقيت نفسه بلا أي تغيير.
+  // نافذة التقييم (نهاية−15د .. نهاية+60د): تُفتح عبر بوابة التحقق المشتركة فقط مع توفر الرابط — القرار 2026-10-31، والتوقيت نفسه بلا أي تغيير.
   // قرار المشرفة 2026-11-02 (النص الوحيد قبل التفعيل): «سيُتاح تقييم البرنامج بعد انتهائه. شكرًا لمشاركتكِ 🌿»
   // — ويُمنع إطلاقًا ذكر هامش التفعيل قبل النهاية (ربع ساعة) في النافذة أو أي واجهة للموقع.
+  // قرار المشرفة 2026-11-05: الضغط داخل النافذة يمر بالتحقق من تأكيد الحضور بنفس آلية Zoom، ثم يُفتح النموذج تلقائيًا بعد التأكيد.
   const evaluationPhase = getEvaluationPhase(event, now);
   const evaluationLinked = Boolean(event.evaluationLink);
   const evaluationOpen = evaluationLinked && evaluationPhase === "open";
@@ -98,6 +108,46 @@ export default function EventCard({
       }
     } finally {
       setZoomChecking(false);
+    }
+  }
+
+  /** فتح نموذج التقييم في تبويب جديد. إن منعه المتصفح تظهر ملاحظة واضحة بلا أي ذكر لتوقيت. */
+  function openEvaluationForm() {
+    if (!event.evaluationLink) return;
+    const opened = window.open(event.evaluationLink, "_blank");
+    if (opened) {
+      try { opened.opener = null; } catch { /* التطبيع بلا فعل */ }
+    } else {
+      setEvalNote("تعذر فتح نموذج التقييم تلقائيًا في متصفحكِ — اضغطي زر التقييم مرة أخرى وستفتح مباشرة.");
+    }
+  }
+
+  /** بوابة التقييم داخل نافذته: فحص الجلسة أولًا (بلا شبكة) ثم التحقق بنفس آلية Zoom،
+   *  و«ليست مؤكدة» تفتح نفس نافذة «تأكيد الحضور» التي تُفتح النموذج بعدها تلقائيًا؛
+   *  الإغلاق أو الفشل لا يفتح النموذج إطلاقًا، والتحقق خاص ببرنامج هذا اللقاء وحده. */
+  async function handleEvalCheck() {
+    if (evalChecking) return;
+    if (hasStoredConfirmation(String(event.id), evalPhone)) {
+      setEvalNote("");
+      openEvaluationForm();
+      return;
+    }
+    setEvalNote("");
+    setEvalChecking(true);
+    try {
+      const res = await checkAttendanceStatus(String(event.id), evalPhone);
+      if (res.kind === "confirmed") {
+        setEvalPanelOpen(false);
+        openEvaluationForm();
+      } else if (res.kind === "not_found") {
+        setEvalPanelOpen(false);
+        confirmSourceRef.current = "eval";
+        setModalOpen(true);
+      } else {
+        setEvalNote(res.kind === "network" ? "تعذر الاتصال بالخادم — تحققي من الإنترنت وحاولي مجددًا." : res.message);
+      }
+    } finally {
+      setEvalChecking(false);
     }
   }
 
@@ -249,7 +299,10 @@ export default function EventCard({
                   {/* التسجيل — اللون الأساسي للهوية دائمًا، وبنفس آلية التأكيد المعتمدة؛ عند إغلاق التسجيل (قبل النهاية بـ15 دقيقة) تفتح النافذة بالملاحظة المعتمدة */}
                   <button
                     type="button"
-                    onClick={() => setModalOpen(true)}
+                    onClick={() => {
+                      confirmSourceRef.current = "reg";
+                      setModalOpen(true);
+                    }}
                     title={attendingOpen ? "فتح نافذة التسجيل" : "انتهى وقت التسجيل لهذا البرنامج"}
                     aria-label="التسجيل لهذا البرنامج"
                     className="flex h-9 w-full items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-brand px-1.5 text-[11px] font-black text-white shadow-sm transition-colors hover:bg-brand-deep focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-pale sm:gap-1.5 sm:px-3 sm:text-[13px]"
@@ -309,21 +362,24 @@ export default function EventCard({
               )}
 
                   {/* التقييم — الوردي المعتمد (rose.brand #DB949F) بنص وأيقونة بيضاء؛ يبقى ظاهرًا وملونًا وقابلًا للضغط في كل الحالات (قرار المشرفة 2026-10-31):
-                      خلال نافذته (قبل نهاية البرنامج بـ15 دقيقة حتى بعد نهايته بـ60 دقيقة) ومع وجود رابطه يفتح النموذج مباشرة بتبويب جديد،
-                      وقبل التفعيل (مع رابط) تُفتح النافذة بالنص الوحيد المعتمد «سيُتاح تقييم البرنامج بعد انتهائه. شكرًا لمشاركتكِ 🌿» (2026-11-02 — بلا أي ذكر لتوقيت التفعيل الداخلي)،
+                      خلال نافذته ومع وجود رابطه يمر الضغط ببوابة التحقق المشتركة (قرار المشرفة 2026-11-05): يُفحص تأكيد الحضور بنفس آلية Zoom،
+                      والمؤكدة يُفتح لها النموذج تلقائيًا بلا نافذة إضافية، وغير المؤكدة تُفتح لها نافذة «تأكيد الحضور» نفسها ثم النموذج تلقائيًا بعد نجاحها،
+                      والإغلاق أو فشل التأكيد لا يفتح النموذج؛ وقبل التفعيل (مع رابط) تُفتح النافذة بالنص الوحيد المعتمد «سيُتاح تقييم البرنامج بعد انتهائه. شكرًا لمشاركتكِ 🌿» (2026-11-02 بلا أي ذكر لتوقيت التفعيل الداخلي)،
                       وبعد النافذة «انتهت فترة تقييم هذا البرنامج»، والحالات بلا رابط تبقى «التقييم غير متاح حاليًا» كما هي — بلا disabled ولا تمييز لوني للإغلاق */}
                   {evaluationOpen ? (
-                    <a
-                      href={event.evaluationLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      title="فتح نموذج تقييم هذا البرنامج"
-                      aria-label="فتح نموذج تقييم هذا البرنامج"
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setEvalPanelOpen((v) => !v);
+                        setEvalNote("");
+                      }}
+                      title="التقييم — التحقق من التأكيد ثم فتح النموذج"
+                      aria-label="التقييم — التحقق من التأكيد ثم فتح النموذج"
                       className="flex h-9 w-full items-center justify-center gap-1 whitespace-nowrap rounded-xl bg-rose-brand px-1.5 text-[11px] font-black text-white transition-colors hover:bg-brand-light focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-brand/40 sm:gap-1.5 sm:px-3 sm:text-[13px]"
                     >
                       <Star className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" aria-hidden="true" />
                       التقييم
-                    </a>
+                    </button>
                   ) : (
                     <button
                       type="button"
@@ -369,7 +425,10 @@ export default function EventCard({
                   {attendingOpen && (
                     <button
                       type="button"
-                      onClick={() => setModalOpen(true)}
+                      onClick={() => {
+                        confirmSourceRef.current = "reg";
+                        setModalOpen(true);
+                      }}
                       className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-brand/40 bg-white px-3 py-2 text-[13px] font-extrabold text-brand-deep transition-colors hover:bg-sand-pale"
                     >
                       <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
@@ -389,12 +448,79 @@ export default function EventCard({
                   </p>
                 </div>
               )}
+
+              {/* بوابة التحقق المشتركة لنافذة التقييم — نفس بنية لوحة Zoom وبنفس منطق التحقق: رقم الجوال →
+                  المؤكدة تُفتح النافذة تلقائيًا، وغير المؤكدة تُفتح لها نافذة «تأكيد الحضور» نفسها ثم النافذة تلقائيًا بعد النجاح */}
+              {evaluationOpen && evalPanelOpen && (
+                <div className="mt-2 rounded-2xl border border-sand bg-sand-pale/60 p-3">
+                  <p className="text-[11px] font-bold leading-5 text-ink/75">
+                    {attendingOpen
+                      ? "لتقييم هذا اللقاء: أكدي حضوركِ أولًا، أو تحقّقي برقم جوالكِ إن كنتِ أكدتِ في جلسة سابقة."
+                      : "انتهى وقت التأكيد — إن كنتِ أكدتِ حضوركِ من قبل فتحقّقي برقم جوالكِ لفتح نافذة التقييم."}
+                  </p>
+                  <div className="mt-2 flex gap-2">
+                    <input
+                      type="tel"
+                      dir="ltr"
+                      inputMode="tel"
+                      maxLength={20}
+                      value={evalPhone}
+                      onChange={(e) => setEvalPhone(e.target.value)}
+                      placeholder="05XXXXXXXX"
+                      aria-label="رقم الجوال للتحقق من تأكيد الحضور"
+                      className="w-full rounded-xl border border-sand bg-white px-3 py-2 text-left text-sm font-semibold text-ink outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand-pale"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleEvalCheck}
+                      disabled={evalChecking}
+                      className="shrink-0 rounded-xl bg-brand px-4 py-2 text-sm font-black text-white transition-colors hover:bg-brand-deep disabled:cursor-not-allowed disabled:opacity-60"
+                    >
+                      {evalChecking ? "جارٍ التحقق…" : "تحقّقي"}
+                    </button>
+                  </div>
+                  {attendingOpen && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        confirmSourceRef.current = "eval";
+                        setModalOpen(true);
+                      }}
+                      className="mt-2 flex w-full items-center justify-center gap-2 rounded-xl border border-brand/40 bg-white px-3 py-2 text-[13px] font-extrabold text-brand-deep transition-colors hover:bg-sand-pale"
+                    >
+                      <ClipboardCheck className="h-4 w-4" aria-hidden="true" />
+                      تأكيد الحضور الآن
+                    </button>
+                  )}
+                  {evalNote && (
+                    <p
+                      role="alert"
+                      className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-[11px] font-bold leading-5 text-amber-800"
+                    >
+                      {evalNote}
+                    </p>
+                  )}
+                  <p className="mt-2 text-[10px] font-semibold text-muted">
+                    التحقق لفتح نافذة التقييم فقط ولا يُسجل حضورًا فعليًا عند فتحها.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
         </div>
       </div>
-      {/* نافذة التأكيد — تُرسم على مستوى الصفحة عبر Portal لتجاوز قصّ البطاقة */}
-      <AttendanceConfirm event={event} now={now} open={modalOpen} onClose={() => setModalOpen(false)} />
+      {/* نافذة التأكيد — تُرسم على مستوى الصفحة عبر Portal لتجاوز قصّ البطاقة.
+          onSuccess تُطلق من داخل النافذة بعد نجاح التأكيد فقط: بوابة التقييم (المصدر «eval») تفتح نموذج التقييم تلقائيًا،
+          والتسجيل العادي/Zoom (المصدر «reg») يبقيان السلوك القائم بلا أي تغيير. */}
+      <AttendanceConfirm
+        event={event}
+        now={now}
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        onSuccess={() => {
+          if (confirmSourceRef.current === "eval") openEvaluationForm();
+        }}
+      />
 
       {/* نافذة الملاحظة الموحّدة (نفس مكوّن نوافذ الموقع) — عبر Portal لتجاوز قصّ البطاقة */}
       {notice !== null &&
